@@ -7,9 +7,9 @@ import {MyPageScreen} from '../screens/MyPageScreen';
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigator = () => {
+export const BottomTabNavigator = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{headerShown: false}}>
       <Tab.Screen name="Home" component={HomeScreen} options={{title: '홈'}} />
       <Tab.Screen
         name="MyPage"
@@ -19,5 +19,3 @@ const BottomTabNavigator = () => {
     </Tab.Navigator>
   );
 };
-
-export default BottomTabNavigator;

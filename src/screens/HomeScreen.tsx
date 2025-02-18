@@ -1,10 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+import {Table} from '../components/Table/Table';
+import {Graph} from '../components/Graph/Graph';
+// import {InformationBar} from '../components/InformationBar/InformationBar';
 
 export const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>홈 화면1</Text>
+      {/* <InformationBar /> */}
+      <Graph />
+      <Table />
     </View>
   );
 };
@@ -14,9 +19,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
   },
 });
 
