@@ -25,6 +25,25 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = kimpscan_frontend/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = kimpscan_frontend/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FE19E1CC2D6D99E100F0D79B /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
+		FE19E1CD2D6D99E100F0D79B /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
+		FE19E1CE2D6D99E100F0D79B /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
+		FE19E1CF2D6D99E100F0D79B /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
+		FE19E1D02D6D99E100F0D79B /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
+		FE19E1D12D6D99E100F0D79B /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
+		FE19E1D22D6D99E100F0D79B /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
+		FE19E1D32D6D99E100F0D79B /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
+		FE19E1D42D6D99E100F0D79B /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Brands.ttf; sourceTree = "<group>"; };
+		FE19E1D52D6D99E100F0D79B /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Regular.ttf; sourceTree = "<group>"; };
+		FE19E1D62D6D99E100F0D79B /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Solid.ttf; sourceTree = "<group>"; };
+		FE19E1D72D6D99E100F0D79B /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
+		FE19E1D82D6D99E100F0D79B /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Foundation.ttf; sourceTree = "<group>"; };
+		FE19E1D92D6D99E100F0D79B /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
+		FE19E1DA2D6D99E100F0D79B /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
+		FE19E1DB2D6D99E100F0D79B /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		FE19E1DC2D6D99E100F0D79B /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
+		FE19E1DD2D6D99E100F0D79B /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
+		FE19E1DE2D6D99E100F0D79B /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +89,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				FE19E1DF2D6D99E100F0D79B /* Fonts */,
 				13B07FAE1A68108700A75B9A /* kimpscan_frontend */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -96,6 +116,32 @@
 				5709B34CF0A7D63546082F79 /* Pods-kimpscan_frontend.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		FE19E1DF2D6D99E100F0D79B /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				FE19E1CC2D6D99E100F0D79B /* AntDesign.ttf */,
+				FE19E1CD2D6D99E100F0D79B /* Entypo.ttf */,
+				FE19E1CE2D6D99E100F0D79B /* EvilIcons.ttf */,
+				FE19E1CF2D6D99E100F0D79B /* Feather.ttf */,
+				FE19E1D02D6D99E100F0D79B /* FontAwesome.ttf */,
+				FE19E1D12D6D99E100F0D79B /* FontAwesome5_Brands.ttf */,
+				FE19E1D22D6D99E100F0D79B /* FontAwesome5_Regular.ttf */,
+				FE19E1D32D6D99E100F0D79B /* FontAwesome5_Solid.ttf */,
+				FE19E1D42D6D99E100F0D79B /* FontAwesome6_Brands.ttf */,
+				FE19E1D52D6D99E100F0D79B /* FontAwesome6_Regular.ttf */,
+				FE19E1D62D6D99E100F0D79B /* FontAwesome6_Solid.ttf */,
+				FE19E1D72D6D99E100F0D79B /* Fontisto.ttf */,
+				FE19E1D82D6D99E100F0D79B /* Foundation.ttf */,
+				FE19E1D92D6D99E100F0D79B /* Ionicons.ttf */,
+				FE19E1DA2D6D99E100F0D79B /* MaterialCommunityIcons.ttf */,
+				FE19E1DB2D6D99E100F0D79B /* MaterialIcons.ttf */,
+				FE19E1DC2D6D99E100F0D79B /* Octicons.ttf */,
+				FE19E1DD2D6D99E100F0D79B /* SimpleLineIcons.ttf */,
+				FE19E1DE2D6D99E100F0D79B /* Zocial.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -376,10 +422,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -448,10 +491,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
