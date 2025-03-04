@@ -1,20 +1,21 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {RootStackParamList} from '../../types/navigation';
 import {SearchBar} from '../SearchBar/SearchBar';
-// import Icon from 'react-native-vector-icons/Ionicons';
+// import SearchIcon from 'react-native-vector-icons/Ionicons';
+import NotificationsIcon from 'react-native-vector-icons/Ionicons';
 
 type Navigation = NavigationProp<RootStackParamList, 'Home'>;
 
 export const Header = () => {
   const navigation = useNavigation<Navigation>();
 
-  const [isActiveSearchbar, setIsActiveSearchbar] = useState(false);
-  const togglehandler = () => {
-    setIsActiveSearchbar(prev => !prev);
-  };
+  // const [isActiveSearchbar, setIsActiveSearchbar] = useState(false);
+  // const togglehandler = () => {
+  //   setIsActiveSearchbar(prev => !prev);
+  // };
 
   console.log('Header');
   return (
@@ -24,13 +25,11 @@ export const Header = () => {
           <Text style={styles.logo}>LOGO</Text>
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={togglehandler}>
-            <Text style={styles.logo}>검색</Text>
-            {isActiveSearchbar && <SearchBar />}
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('MyPage')}>
-            {/* <Icon name="notifications" size={25} color="#000" /> */}
-            <Text style={styles.logo}>알람</Text>
+          <SearchBar />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Notifications')}>
+            <NotificationsIcon name="notifications" size={25} color="#000" />
+            {/* <Text style={styles.logo}>알람</Text> */}
           </TouchableOpacity>
         </View>
       </View>
@@ -57,9 +56,9 @@ const styles = StyleSheet.create({
     // fontWeight: 'bold',
   },
   buttonContainer: {
-    flexDirection: 'row', // 버튼들을 가로로 배치
-    justifyContent: 'space-between',
-    gap: 20,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 15,
   },
   // searchContainer: {
   //   flex: 1,
