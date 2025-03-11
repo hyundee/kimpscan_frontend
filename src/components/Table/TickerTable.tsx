@@ -24,6 +24,8 @@ export const TickerTable = ({data}: ITickerTable) => {
   // const [socket, setSocket] = useState<WebSocket | null>(null);
   const [coinList, setCoinList] = useState<Record<string, CoinInfo>>({});
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
+  // const [kimpPrices, setKimpPrices] = useState<Record<string, number>>({});
+  // const [kimpColors, setKimpColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setCoinList(data);
@@ -38,6 +40,25 @@ export const TickerTable = ({data}: ITickerTable) => {
     }
   };
 
+  // const updateKimpPrice = (newKimp: number, symbol?: string) => {
+  //   if (symbol) {
+  //     setKimpPrices(prevPrices => {
+  //       const prevKimp = prevPrices[symbol] ?? newKimp;
+  //       const isRising = newKimp > prevKimp;
+
+  //       setKimpColors(prevColors => ({
+  //         ...prevColors,
+  //         [symbol]: isRising ? 'red' : 'blue',
+  //       }));
+
+  //       return {
+  //         ...prevPrices,
+  //         [symbol]: newKimp,
+  //       };
+  //     });
+  //   }
+  // };
+
   const tableHead = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
 
   const tableData = Object.values(coinList).map(value => {
@@ -46,7 +67,16 @@ export const TickerTable = ({data}: ITickerTable) => {
     const usdtPrice = formatInteger(value.usdtPrice);
     const finalUsdtPrice =
       usdtPrice < 10 ? Number(value.usdtPrice).toFixed(4) : usdtPrice;
-    const kimpPrice = `${Number(value.kimp).toFixed(3)}%`;
+    const kimpValue = Number(value.kimp).toFixed(3);
+
+    const previousKimp = coinSymbol && coinList[coinSymbol]?.kimp; // 이전 kimp 값
+    const kimpColor =
+      previousKimp && Number(value.kimp) > Number(previousKimp)
+        ? 'red'
+        : 'blue';
+
+    const finalKimpPrice = <Text style={{color: kimpColor}}>{kimpValue}%</Text>;
+
     const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
 
     const won24hVolume = formatInteger(value.won24hVolume);
@@ -70,14 +100,17 @@ export const TickerTable = ({data}: ITickerTable) => {
 
     return [
       [coinSymbol, value.korName],
-      [kimpPrice, kimpPriceText],
+      [finalKimpPrice, kimpPriceText],
       [volumeRatio, volumeRatioText],
       bookMarkButton,
     ];
   });
 
   const renderCustomCell = (
-    cellData: React.JSX.Element | (string | undefined)[],
+    cellData:
+      | React.JSX.Element
+      | (string | React.JSX.Element)[]
+      | (string | undefined)[],
   ) => {
     if (Array.isArray(cellData)) {
       return (
