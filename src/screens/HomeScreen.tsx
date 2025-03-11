@@ -1,13 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {View, StyleSheet, Text} from 'react-native';
-import {TickerTable} from '../components/Table/Table';
+import {TickerTable} from '../components/Table/TickerTable';
 import {Graph} from '../components/Graph/Graph';
 import {Coins} from '../types/coins';
 
 export const HomeScreen = () => {
   const ws = useRef<WebSocket | null>(null);
-  const [coins, setCoins] = useState<Coins>();
+  const [coins, setCoins] = useState<Coins>({
+    usdWonExRage: 0,
+    kimpTickerMap: {},
+  });
   // const [usdWonExRage, setUsdWonExRage] = useState<number>(0);
 
   const fetchData = async () => {
@@ -89,7 +92,7 @@ export const HomeScreen = () => {
         </Text>
       </View>
       <Graph />
-      <TickerTable data={coins?.kimpTickerMap} />
+      <TickerTable data={coins.kimpTickerMap} />
     </View>
   );
 };
@@ -113,5 +116,3 @@ const styles = StyleSheet.create({
     color: 'red',
   },
 });
-
-// export default HomeScreen;
