@@ -33,16 +33,15 @@ export const TickerTable = ({data}: ITickerTable) => {
   }, [data]);
 
   useEffect(() => {
-    // coinList가 변경될 때만 kimpHistory를 설정하도록 함
-    const updatedKimpHistory: Record<string, number> = {};
-    Object.keys(coinList).forEach(symbol => {
-      updatedKimpHistory[symbol] = Number(coinList[symbol].kimp);
-    });
-    // coinList가 업데이트된 후 kimpHistory 업데이트
-    if (Object.keys(updatedKimpHistory).length > 0) {
-      setKimpHistory(updatedKimpHistory);
+    if (Object.keys(kimpHistory).length === 0) {
+      // 초기 값이 비어있다면만 실행
+      const updatedKimpHistory: Record<string, number> = {};
+      Object.keys(coinList).forEach(symbol => {
+        updatedKimpHistory[symbol] = Number(coinList[symbol].kimp);
+      });
+      setKimpHistory(updatedKimpHistory); // 상태 업데이트
     }
-  }, [coinList]); // coinList가 변경될 때만 실행되도록 설정
+  }, [coinList, kimpHistory]); // coinList와 kimpHistory에 의존
 
   const toggleBookMark = (symbol?: string) => {
     if (symbol) {
