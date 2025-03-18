@@ -24,12 +24,25 @@ export const TickerTable = ({data}: ITickerTable) => {
   // const [socket, setSocket] = useState<WebSocket | null>(null);
   const [coinList, setCoinList] = useState<Record<string, CoinInfo>>({});
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
+  const [kimpHistory, setKimpHistory] = useState<Record<string, number>>({});
   // const [kimpPrices, setKimpPrices] = useState<Record<string, number>>({});
   // const [kimpColors, setKimpColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setCoinList(data);
   }, [data]);
+
+  useEffect(() => {
+    // coinList가 변경될 때만 kimpHistory를 설정하도록 함
+    const updatedKimpHistory: Record<string, number> = {};
+    Object.keys(coinList).forEach(symbol => {
+      updatedKimpHistory[symbol] = Number(coinList[symbol].kimp);
+    });
+    // coinList가 업데이트된 후 kimpHistory 업데이트
+    if (Object.keys(updatedKimpHistory).length > 0) {
+      setKimpHistory(updatedKimpHistory);
+    }
+  }, [coinList]); // coinList가 변경될 때만 실행되도록 설정
 
   const toggleBookMark = (symbol?: string) => {
     if (symbol) {
@@ -39,6 +52,15 @@ export const TickerTable = ({data}: ITickerTable) => {
       }));
     }
   };
+
+  // const updateKimpPrice = (newKimp: number, symbol?: string) => {
+  //   if (symbol) {
+  //     setKimpHistory(prevHistory => ({
+  //       ...prevHistory,
+  //       [symbol]: newKimp, // 최신 Kimp 값을 기록
+  //     }));
+  //   }
+  // };
 
   // const updateKimpPrice = (newKimp: number, symbol?: string) => {
   //   if (symbol) {
@@ -69,12 +91,11 @@ export const TickerTable = ({data}: ITickerTable) => {
       usdtPrice < 10 ? Number(value.usdtPrice).toFixed(4) : usdtPrice;
     const kimpValue = Number(value.kimp).toFixed(3);
 
-    const previousKimp = coinSymbol && coinList[coinSymbol]?.kimp; // 이전 kimp 값
+    const previousKimp = coinSymbol && kimpHistory[coinSymbol];
     const kimpColor =
-      previousKimp && Number(value.kimp) > Number(previousKimp)
-        ? 'red'
-        : 'blue';
+      previousKimp && Number(value.kimp) > previousKimp ? 'red' : 'blue';
 
+    // Kimp 값을 텍스트로 렌더링하고 색상 적용
     const finalKimpPrice = <Text style={{color: kimpColor}}>{kimpValue}%</Text>;
 
     const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
@@ -97,6 +118,8 @@ export const TickerTable = ({data}: ITickerTable) => {
         />
       </TouchableOpacity>
     );
+
+    // updateKimpPrice(Number(value.kimp), coinSymbol);
 
     return [
       [coinSymbol, value.korName],
@@ -144,7 +167,7 @@ export const TickerTable = ({data}: ITickerTable) => {
                 <Cell
                   key={cellIndex}
                   data={renderCustomCell(cellData)}
-                  style={[{flex: flexArr[cellIndex]}]}
+                  style={{flex: flexArr[cellIndex]}}
                 />
               ))}
             </TableWrapper>
