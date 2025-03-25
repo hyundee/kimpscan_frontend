@@ -11,7 +11,6 @@ export const HomeScreen = () => {
     usdWonExRage: 0,
     kimpTickerMap: {},
   });
-  // const [usdWonExRage, setUsdWonExRage] = useState<number>(0);
 
   const fetchData = async () => {
     try {
@@ -42,8 +41,6 @@ export const HomeScreen = () => {
         const parsedData =
           typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-        // console.log(parsedData.usdWonExRage);
-        // setUsdWonExRage(parsedData.usdWonExRage ?? usdWonExRage);
         setCoins(prev => ({
           ...prev,
           usdWonExRage: parsedData.usdWonExRage ?? prev?.usdWonExRage,
@@ -81,7 +78,7 @@ export const HomeScreen = () => {
     };
   }, []);
 
-  console.log(coins);
+  // console.log(coins);
 
   return (
     <View style={styles.container}>
