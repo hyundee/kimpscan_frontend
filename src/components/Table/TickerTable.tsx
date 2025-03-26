@@ -15,6 +15,8 @@ import {
   formatNumber,
   formatPrice,
 } from '../../utils/formatNumber';
+import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
+
 
 interface ITickerTable {
   data: Record<string, CoinInfo>;
@@ -37,18 +39,33 @@ export const TickerTable = ({data}: ITickerTable) => {
     });
   }, [coinList]);
 
+  useEffect(() => {
+    loadBookmarks().then(setBookMarks);
+  }, []);
+
   const toggleBookMark = (symbol?: string) => {
     if (symbol) {
-      setBookMarks(prev => ({
-        ...prev,
-        [symbol]: !prev[symbol], // 해당 코인의 즐겨찾기 상태를 반전
-      }));
+      setBookMarks(prev => {
+        const updated = {
+          ...prev,
+          [symbol]: !prev[symbol],
+        };
+        saveBookmarks(updated);
+        return updated;
+      });
     }
   };
 
+  const sortedCoinList = Object.values(coinList).sort((a, b) => {
+    const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
+    const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
+    if (aBookmarked === bBookmarked) {return 0;}
+    return aBookmarked ? -1 : 1;
+  });
+
   const tableHead = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
 
-  const tableData = Object.values(coinList).map(value => {
+  const tableData = sortedCoinList.map(value => {
     const coinSymbol = value.rootSymbol;
     const wonPrice = formatPrice(value.wonPrice);
     const usdtPrice = formatInteger(value.usdtPrice);
@@ -77,14 +94,12 @@ export const TickerTable = ({data}: ITickerTable) => {
         style={styles.bookmarkContainer}
         onPress={() => toggleBookMark(coinSymbol)}>
         <Icon
-          name={coinSymbol && bookMarks[coinSymbol] ? 'star' : 'staro'}
+          name={bookMarks[coinSymbol!] ? 'star' : 'staro'}
           size={20}
           color="#000"
         />
       </TouchableOpacity>
     );
-
-    // updateKimpPrice(Number(value.kimp), coinSymbol);
 
     return [
       [coinSymbol, value.korName],

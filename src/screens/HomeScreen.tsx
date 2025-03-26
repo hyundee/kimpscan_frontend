@@ -85,7 +85,7 @@ export const HomeScreen = () => {
       <View style={styles.exchange}>
         <Text>
           달러 원 환율 :
-          <Text style={styles.exchangeText}>{` ${coins?.usdWonExRage}원`}</Text>
+          <Text style={styles.exchangeText}>{` ${(coins?.usdWonExRage).toFixed(0)}원`}</Text>
         </Text>
       </View>
       {/* <Graph /> */}
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   exchangeText: {
-    color: 'red',
+    fontWeight : 'bold',
+    // color: 'red',
   },
 });
