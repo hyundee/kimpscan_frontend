@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
   ScrollView,
@@ -21,27 +21,21 @@ interface ITickerTable {
 }
 
 export const TickerTable = ({data}: ITickerTable) => {
-  // const [socket, setSocket] = useState<WebSocket | null>(null);
   const [coinList, setCoinList] = useState<Record<string, CoinInfo>>({});
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
-  const [kimpHistory, setKimpHistory] = useState<Record<string, number>>({});
-  // const [kimpPrices, setKimpPrices] = useState<Record<string, number>>({});
-  // const [kimpColors, setKimpColors] = useState<Record<string, string>>({});
+  // const [kimpHistory, setKimpHistory] = useState<Record<string, number>>({});
+  const kimpHistoryRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     setCoinList(data);
   }, [data]);
 
   useEffect(() => {
-    if (Object.keys(kimpHistory).length === 0) {
-      // 초기 값이 비어있다면만 실행
-      const updatedKimpHistory: Record<string, number> = {};
-      Object.keys(coinList).forEach(symbol => {
-        updatedKimpHistory[symbol] = Number(coinList[symbol].kimp);
-      });
-      setKimpHistory(updatedKimpHistory); // 상태 업데이트
-    }
-  }, [coinList, kimpHistory]); // coinList와 kimpHistory에 의존
+    Object.entries(coinList).forEach(([symbol, info]) => {
+      const currentKimp = Number(info.kimp);
+      kimpHistoryRef.current[symbol] = currentKimp;
+    });
+  }, [coinList]);
 
   const toggleBookMark = (symbol?: string) => {
     if (symbol) {
@@ -52,34 +46,6 @@ export const TickerTable = ({data}: ITickerTable) => {
     }
   };
 
-  // const updateKimpPrice = (newKimp: number, symbol?: string) => {
-  //   if (symbol) {
-  //     setKimpHistory(prevHistory => ({
-  //       ...prevHistory,
-  //       [symbol]: newKimp, // 최신 Kimp 값을 기록
-  //     }));
-  //   }
-  // };
-
-  // const updateKimpPrice = (newKimp: number, symbol?: string) => {
-  //   if (symbol) {
-  //     setKimpPrices(prevPrices => {
-  //       const prevKimp = prevPrices[symbol] ?? newKimp;
-  //       const isRising = newKimp > prevKimp;
-
-  //       setKimpColors(prevColors => ({
-  //         ...prevColors,
-  //         [symbol]: isRising ? 'red' : 'blue',
-  //       }));
-
-  //       return {
-  //         ...prevPrices,
-  //         [symbol]: newKimp,
-  //       };
-  //     });
-  //   }
-  // };
-
   const tableHead = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
 
   const tableData = Object.values(coinList).map(value => {
@@ -88,15 +54,15 @@ export const TickerTable = ({data}: ITickerTable) => {
     const usdtPrice = formatInteger(value.usdtPrice);
     const finalUsdtPrice =
       usdtPrice < 10 ? Number(value.usdtPrice).toFixed(4) : usdtPrice;
+
+    const currentKimp = Number(value.kimp);
+    const previousKimp = kimpHistoryRef.current[coinSymbol!];
+    const kimpColor = previousKimp !== undefined && currentKimp > Number(previousKimp) ? 'red' : 'blue';
+
+    kimpHistoryRef.current[coinSymbol!] = currentKimp;
+
     const kimpValue = Number(value.kimp).toFixed(3);
-
-    const previousKimp = coinSymbol && kimpHistory[coinSymbol];
-    const kimpColor =
-      previousKimp && Number(value.kimp) > previousKimp ? 'red' : 'blue';
-
-    // Kimp 값을 텍스트로 렌더링하고 색상 적용
     const finalKimpPrice = <Text style={{color: kimpColor}}>{kimpValue}%</Text>;
-
     const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
 
     const won24hVolume = formatInteger(value.won24hVolume);
@@ -143,7 +109,11 @@ export const TickerTable = ({data}: ITickerTable) => {
       );
     }
 
-    return cellData;
+    if (React.isValidElement(cellData) || typeof cellData === 'string') {
+      return cellData;
+    }
+
+    return <Text>-</Text>; // 예외 처리
   };
 
   // console.log(data);

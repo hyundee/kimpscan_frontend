@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {View, StyleSheet, Text} from 'react-native';
 import {TickerTable} from '../components/Table/TickerTable';
-import {Graph} from '../components/Graph/Graph';
+// import {Graph} from '../components/Graph/Graph';
 import {Coins} from '../types/coins';
 
 export const HomeScreen = () => {
@@ -88,7 +88,7 @@ export const HomeScreen = () => {
           <Text style={styles.exchangeText}>{` ${coins?.usdWonExRage}원`}</Text>
         </Text>
       </View>
-      <Graph />
+      {/* <Graph /> */}
       <TickerTable data={coins.kimpTickerMap} />
     </View>
   );
