@@ -10,12 +10,14 @@ import {
 import {CoinInfo} from '../../types/coins';
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import Icon from 'react-native-vector-icons/AntDesign';
+// import ChartLegendIcon from 'react-native-vector-icons/Ionicons';
 import {
   formatInteger,
   formatNumber,
   formatPrice,
 } from '../../utils/formatNumber';
 import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
+import { ChartLegend } from '../Legend/ChartLegend';
 
 
 interface ITickerTable {
@@ -137,6 +139,7 @@ export const TickerTable = ({data}: ITickerTable) => {
 
   return (
     <View style={styles.container}>
+      <ChartLegend />
       <ScrollView style={styles.scrollView}>
         <Table borderStyle={styles.tableBorder}>
           <Row
@@ -170,9 +173,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopColor: 'black',
     borderTopWidth: 2,
+    backgroundColor: '#000',
   },
   scrollView: {
     width: '100%',
+    backgroundColor: '#fff',
   },
   tableBorder: {
     borderWidth: 1,
