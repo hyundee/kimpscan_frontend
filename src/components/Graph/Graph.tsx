@@ -2,14 +2,16 @@ import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {ScrollView, StyleSheet, View, Dimensions} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
+import { GraphLegend } from '../Legend/GraphLegend';
 
 export const Graph = () => {
   const ws = useRef<WebSocket | null>(null);
   const screenWidth = Dimensions.get('window').width; // 화면의 가로 크기
   // const screenHeight = Dimensions.get('window').height; // 화면의 세로 크기
+  const scrollRef = useRef<ScrollView>(null);
 
   const [priceMovingAverage, setPriceMovingAverage] = useState<number[][]>([]);
-  const [webSocket, setWebSocket] = useState<number[]>([]);
+  // const [webSocket, setWebSocket] = useState<number[]>([]);
   const [KimpPrice, setKimpPrice] = useState<number[]>([0]);
   const [ma5s, setMa5s] = useState<number[]>([0]);
   const [ma20s, setMa20s] = useState<number[]>([0]);
@@ -78,18 +80,16 @@ export const Graph = () => {
     };
   }, []);
 
-  // console.log(webSocket);
-
-  // const sendMessage = (message: string) => {
-  //   if (ws.current && ws.current.readyState === 1) {
-  //     ws.current.send(JSON.stringify(message));
-  //     console.log('웹소켓 메시지 전송:', message);
-  //   } else {
-  //     console.log('웹소켓이 아직 연결되지 않았거나 닫혀 있음.');
+  // useEffect(() => {
+  //   if (KimpPrice.length > 0) {
+  //     scrollRef.current?.scrollToEnd({ animated: true });
   //   }
-  // };
+  // }, [KimpPrice]);
 
-  const labels = KimpPrice.map((_, index) => `${index + 1}s`);
+  // const chartWidth = Math.max(KimpPrice.length * 40, screenWidth);
+  const labels = KimpPrice.map((_, index) =>
+    index === 0 || (index + 1) % 5 === 0 ? `${index + 1}s` : ''
+  );
 
   const data = {
     labels,
@@ -113,34 +113,39 @@ export const Graph = () => {
   };
 
   return (
-    <ScrollView horizontal={true} style={styles.container}>
-      <View>
-        <LineChart
-          key={KimpPrice.length}
-          data={data}
-          width={screenWidth}
-          height={220}
-          withShadow={false}
-          withDots={false}
-          chartConfig={{
-            decimalPlaces: 5,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-          }}
-        />
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <GraphLegend />
+      <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} >
+          <LineChart
+            key={KimpPrice.length}
+            data={data}
+            width={screenWidth}
+            height={180}
+            withShadow={false}
+            withDots={false}
+            // segments={10}
+            // yLabelsOffset={30}
+            style={styles.graph}
+            chartConfig={{
+              formatYLabel: (yValue) => Number(yValue).toFixed(2),
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+            }}
+          />
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     width: '100%',
     flex: 1,
-    // paddingTop: 26,
+    backgroundColor: '#000',
   },
   text: {
     fontSize: 24,
@@ -156,9 +161,6 @@ const styles = StyleSheet.create({
   //   color: '#000',
   // },
   graph: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopWidth: 1,
+    marginLeft: -20,
   },
 });
