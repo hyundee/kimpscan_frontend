@@ -18,6 +18,8 @@ import {
 } from '../../utils/formatNumber';
 import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
 import { ChartLegend } from '../Legend/ChartLegend';
+import { useSelectedCoin } from '../../store/useSelectedCoin';
+import { SearchBar } from '../SearchBar/SearchBar';
 
 
 interface ITickerTable {
@@ -26,6 +28,8 @@ interface ITickerTable {
 
 export const TickerTable = ({data}: ITickerTable) => {
   const [coinList, setCoinList] = useState<Record<string, CoinInfo>>({});
+  const [query, setQuery] = useState('');
+  const [filteredData, setFilteredData] = useState<CoinInfo[]>([]);
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
   // const [kimpHistory, setKimpHistory] = useState<Record<string, number>>({});
   const kimpHistoryRef = useRef<Record<string, number>>({});
@@ -58,7 +62,9 @@ export const TickerTable = ({data}: ITickerTable) => {
     }
   };
 
-  const sortedCoinList = Object.values(coinList).sort((a, b) => {
+  const baseData = query ? filteredData : Object.values(coinList);
+
+  const sortedCoinList = baseData.sort((a, b) => {
     const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
     const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
     if (aBookmarked === bBookmarked) {return 0;}
@@ -119,10 +125,11 @@ export const TickerTable = ({data}: ITickerTable) => {
   ) => {
     if (Array.isArray(cellData)) {
       return (
-        <View style={styles.cellContainer}>
-          <Text style={styles.strongText}>{cellData[0]}</Text>
-          <Text style={styles.smallText}>{cellData[1]}</Text>
-        </View>
+          <View style={styles.cellContainer}>
+            <Text style={styles.strongText}>{cellData[0]}</Text>
+            <Text style={styles.smallText}>{cellData[1]}</Text>
+          </View>
+
       );
     }
 
@@ -133,13 +140,32 @@ export const TickerTable = ({data}: ITickerTable) => {
     return <Text>-</Text>; // 예외 처리
   };
 
-  // console.log(data);
+  const handlePress = (symbol : string[]) => {
+    const coinKey = symbol[0] + 'USDT';
+    useSelectedCoin.getState().setCoin(coinKey);
+  };
+
+  const handleSearch = (text: string) => {
+    setQuery(text);
+    const result = Object.values(coinList).filter((item) => {
+      return (
+        item.korName!.toLowerCase().includes(text.toLowerCase()) ||
+        item.rootSymbol!.toLowerCase().includes(text.toLowerCase())
+      );
+    });
+    setFilteredData(result);
+  };
+
+  console.log(filteredData);
   // console.log(data, tableData);
   const flexArr = [2, 2, 2, 1];
 
   return (
     <View style={styles.container}>
-      <ChartLegend />
+      <View style={styles.top}>
+        <SearchBar query={query} handleSearch={handleSearch} />
+        <ChartLegend />
+      </View>
       <ScrollView style={styles.scrollView}>
         <Table borderStyle={styles.tableBorder}>
           <Row
@@ -150,14 +176,23 @@ export const TickerTable = ({data}: ITickerTable) => {
           />
           {tableData.map((rowData, rowIndex) => (
             <TableWrapper key={rowIndex} style={styles.row}>
-              {rowData.map((cellData, cellIndex) => (
-                <Cell
-                  key={cellIndex}
-                  data={renderCustomCell(cellData)}
-                  style={{flex: flexArr[cellIndex]}}
-                />
-              ))}
-            </TableWrapper>
+                {rowData.map((cellData, cellIndex) => (
+                  <Cell
+                      key={cellIndex}
+                      data={
+                        cellIndex === 0 ? (
+                          <TouchableOpacity
+                            onPress={() => handlePress(rowData[0] as string[])}>
+                            {renderCustomCell(cellData)}
+                          </TouchableOpacity>
+                        ) : (
+                          renderCustomCell(cellData)
+                        )
+                      }
+                      style={{flex: flexArr[cellIndex]}}
+                    />
+                ))}
+              </TableWrapper>
           ))}
         </Table>
       </ScrollView>
@@ -174,6 +209,16 @@ const styles = StyleSheet.create({
     borderTopColor: 'black',
     borderTopWidth: 2,
     backgroundColor: '#000',
+  },
+  top : {
+    marginTop : 10,
+    marginBottom : 5,
+    // marginHorizontal : 5,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent : 'space-between',
+    flexDirection: 'row',
   },
   scrollView: {
     width: '100%',
@@ -197,6 +242,8 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    // borderWidth: 1,
+    // borderColor: '#C1C0B9',
   },
   cellContainer: {
     margin: 3,

@@ -2,9 +2,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {ScrollView, StyleSheet, View, Dimensions} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
+import { useSelectedCoin } from '../../store/useSelectedCoin';
 import { GraphLegend } from '../Legend/GraphLegend';
 
 export const Graph = () => {
+  const coin = useSelectedCoin(state => state.coin);
   const ws = useRef<WebSocket | null>(null);
   const screenWidth = Dimensions.get('window').width; // 화면의 가로 크기
   // const screenHeight = Dimensions.get('window').height; // 화면의 세로 크기
@@ -16,10 +18,16 @@ export const Graph = () => {
   const [ma5s, setMa5s] = useState<number[]>([0]);
   const [ma20s, setMa20s] = useState<number[]>([0]);
 
-  const fetchData = async () => {
+  useEffect(() => {
+      console.log('선택된 코인:', coin);
+      fetchData(coin);
+
+  }, [coin]);
+
+  const fetchData = async (symbol : string) => {
     try {
       const response = await axios.get(
-        'https://clarify.kr/exchange/moving-avgs/init?symbol=XRPUSDT',
+        `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
       );
       console.log('Data:', response.data);
       setPriceMovingAverage(response.data);
@@ -28,9 +36,9 @@ export const Graph = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     if (priceMovingAverage.length > 0) {
@@ -47,8 +55,8 @@ export const Graph = () => {
       console.log('이동평균 웹소켓 연결 성공');
       // ws.current.send(JSON.stringify('XRPUSDT'));
       if (ws.current && ws.current.readyState === 1) {
-        ws.current.send('XRPUSDT');
-        console.log('웹소켓 메시지 전송:', 'XRPUSDT');
+        ws.current.send(coin);
+        console.log('웹소켓 메시지 전송:', coin);
       } else {
         console.log('웹소켓이 아직 연결되지 않았거나 닫혀 있음.');
       }
@@ -78,7 +86,7 @@ export const Graph = () => {
         ws.current.close();
       }
     };
-  }, []);
+  }, [coin]);
 
   // useEffect(() => {
   //   if (KimpPrice.length > 0) {
@@ -88,7 +96,7 @@ export const Graph = () => {
 
   // const chartWidth = Math.max(KimpPrice.length * 40, screenWidth);
   const labels = KimpPrice.map((_, index) =>
-    index === 0 || (index + 1) % 5 === 0 ? `${index + 1}s` : ''
+    index === 0 || (index + 1) % 5 === 0 ? `${index + 1}초` : ''
   );
 
   const data = {
@@ -96,17 +104,17 @@ export const Graph = () => {
     datasets: [
       {
         data: KimpPrice,
-        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`, // 첫 번째 선의 색상
+        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
         strokeWidth: 4, // 선의 두께
       },
       {
         data: ma5s,
-        color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`, // 두 번째 선의 색상
+        color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
         strokeWidth: 4, // 선의 두께
       },
       {
         data: ma20s,
-        color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // 세 번째 선의 색상
+        color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
         strokeWidth: 4, // 선의 두께
       },
     ],
