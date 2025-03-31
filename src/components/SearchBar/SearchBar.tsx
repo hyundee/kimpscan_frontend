@@ -31,7 +31,7 @@ export const SearchBar = ({query, handleSearch} : ISearchBar) => {
         style={styles.input}
         value={text}
         onChangeText={setText}
-        placeholder="검색" />
+        placeholder="종목명을 입력하세요" />
       <TouchableOpacity onPress={togglehandler}>
         <SearchIcon style={styles.icon} name="search" size={25} color="#fff" />
       </TouchableOpacity>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     borderColor: '#efefef',
     borderWidth: 1,
     padding: 5,
-    width: '65%',
+    width: '60%',
   },
   text: {
     fontSize: 18,

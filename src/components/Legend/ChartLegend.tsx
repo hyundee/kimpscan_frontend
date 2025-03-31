@@ -8,29 +8,30 @@ export const ChartLegend = () => {
   return (
     <TouchableOpacity style={styles.chartLegend} onPress={() => setActive(prev => !prev)}>
       {
-        active && <View style={styles.chartLegendText}>
+       active && <View style={styles.chartLegendText}>
           <Text style={styles.TitleText}>* 갱신주기</Text>
           <Text style={styles.Text}>1일: 달러 원 환율</Text>
           <Text style={styles.Text}>5초: 바이낸스 24시간 거래량</Text>
           <Text style={styles.Text}>1초: 그 외</Text>
         </View>
       }
-      <Icon name="information-circle-outline" size={25} color="#fff" />
+      <Icon name="information-circle-outline" size={25} color="#fff" style={styles.icon} />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   chartLegend: {
-    position : 'relative',
-    // alignSelf: 'flex-end',
+    position : 'absolute',
+    right : 0,
+    bottom : 0,
     // marginBottom : 5,
     // marginRight: 5,
   },
   chartLegendText : {
-    position: 'absolute',
-    right : 26,
-    bottom : 10,
+    position : 'relative',
+    right : 28,
+    top : 24,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 12,
     paddingVertical :8,
@@ -44,5 +45,8 @@ const styles = StyleSheet.create({
   },
   Text : {
     fontSize : 12,
+  },
+  icon : {
+    alignSelf: 'flex-end',
   },
 });

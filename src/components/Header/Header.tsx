@@ -3,7 +3,7 @@ import {View, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {RootStackParamList} from '../../types/navigation';
-import {SearchBar} from '../SearchBar/SearchBar';
+// import {SearchBar} from '../SearchBar/SearchBar';
 // import SearchIcon from 'react-native-vector-icons/Ionicons';
 import NotificationsIcon from 'react-native-vector-icons/Ionicons';
 
@@ -29,7 +29,7 @@ export const Header = () => {
           />
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
-          <SearchBar />
+          {/* <SearchBar /> */}
           <TouchableOpacity
             onPress={() => navigation.navigate('Notifications')}>
             <NotificationsIcon name="notifications" size={25} color="#000" />

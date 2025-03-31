@@ -10,7 +10,7 @@ import {
 import {CoinInfo} from '../../types/coins';
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import Icon from 'react-native-vector-icons/AntDesign';
-// import ChartLegendIcon from 'react-native-vector-icons/Ionicons';
+import SortIcon from 'react-native-vector-icons/FontAwesome';
 import {
   formatInteger,
   formatNumber,
@@ -31,8 +31,11 @@ export const TickerTable = ({data}: ITickerTable) => {
   const [query, setQuery] = useState('');
   const [filteredData, setFilteredData] = useState<CoinInfo[]>([]);
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
-  // const [kimpHistory, setKimpHistory] = useState<Record<string, number>>({});
   const kimpHistoryRef = useRef<Record<string, number>>({});
+
+  const [sortKey, setSortKey] = useState<'korName' | 'kimp' | 'volume' | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
 
   useEffect(() => {
     setCoinList(data);
@@ -62,16 +65,48 @@ export const TickerTable = ({data}: ITickerTable) => {
     }
   };
 
+  const handleSort = (key: 'korName' | 'kimp' | 'volume') => {
+    if (sortKey === key) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
+
   const baseData = query ? filteredData : Object.values(coinList);
 
-  const sortedCoinList = baseData.sort((a, b) => {
+  const bookmarkedFirst = baseData.sort((a, b) => {
     const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
     const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
     if (aBookmarked === bBookmarked) {return 0;}
     return aBookmarked ? -1 : 1;
   });
 
-  const tableHead = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
+  if (sortKey) {
+    bookmarkedFirst.sort((a, b) => {
+      let aValue: number | string = '';
+      let bValue: number | string = '';
+      if (sortKey === 'korName') {
+        aValue = a.korName!;
+        bValue = b.korName!;
+      } else if (sortKey === 'kimp') {
+        aValue = Number(a.kimp);
+        bValue = Number(b.kimp);
+      } else if (sortKey === 'volume') {
+        aValue = a.won24hVolume! + a.usdt24hVolume;
+        bValue = b.won24hVolume! + b.usdt24hVolume;
+      }
+      if (aValue < bValue) {return sortOrder === 'asc' ? -1 : 1;}
+      if (aValue > bValue) {return sortOrder === 'asc' ? 1 : -1;}
+      return 0;
+    });
+  }
+
+  const sortedCoinList = bookmarkedFirst;
+
+  const headerTitles = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
+  const sortKeys = ['korName', 'kimp', 'volume', 'none'];
 
   const tableData = sortedCoinList.map(value => {
     const coinSymbol = value.rootSymbol;
@@ -156,7 +191,7 @@ export const TickerTable = ({data}: ITickerTable) => {
     setFilteredData(result);
   };
 
-  console.log(filteredData);
+  // console.log(filteredData);
   // console.log(data, tableData);
   const flexArr = [2, 2, 2, 1];
 
@@ -168,8 +203,23 @@ export const TickerTable = ({data}: ITickerTable) => {
       </View>
       <ScrollView style={styles.scrollView}>
         <Table borderStyle={styles.tableBorder}>
-          <Row
-            data={tableHead}
+        <Row
+            data={headerTitles.map((title, index) => {
+              const key = sortKeys[index];
+              const isSortable = key !== 'none';
+
+              return isSortable ? (
+                <TouchableOpacity key={index} onPress={() => handleSort(key as any)}>
+                  <Text style={styles.headerText}>
+                    {title}
+                    <SortIcon name="sort" size={15} style={styles.sort} />
+                    {/* {sortKey === key && (sortOrder === 'asc' ? ' ↑' : ' ↓')} */}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text key={index} style={styles.headerText}>{title}</Text>
+              );
+            })}
             style={styles.header}
             textStyle={styles.headerText}
             flexArr={flexArr}
@@ -211,6 +261,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   top : {
+    position : 'relative',
     marginTop : 10,
     marginBottom : 5,
     // marginHorizontal : 5,
@@ -266,5 +317,8 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
     // textAlign: 'center',
+  },
+  sort : {
+    marginLeft : 3,
   },
 });
