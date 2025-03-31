@@ -4,36 +4,36 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Text,
   StyleSheet,
 } from 'react-native';
 import SearchIcon from 'react-native-vector-icons/Ionicons';
 
-export const SearchBar = () => {
-  const [isActiveSearchbar, setIsActiveSearchbar] = useState(false);
-  const [text, setText] = useState('');
+interface ISearchBar {
+  query : string,
+  handleSearch : (text : string) => void
+}
+
+export const SearchBar = ({query, handleSearch} : ISearchBar) => {
+  // const [isActiveSearchbar, setIsActiveSearchbar] = useState(false);
+  const [text, setText] = useState(query);
 
   const togglehandler = () => {
-    setIsActiveSearchbar(prev => !prev);
+    handleSearch(text);
   };
 
-  const handleChangeText = (newText: string) => {
-    setText(newText);
-  };
+  // const handleChangeText = (newText: string) => {
+  //   setText(newText);
+  // };
 
   return (
     <View style={styles.container}>
-      {isActiveSearchbar && (
-        <TextInput
-          style={styles.input}
-          value={text}
-          onChangeText={handleChangeText}
-          placeholder="검색">
-          <Text style={styles.text}>{text}</Text>
-        </TextInput>
-      )}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="검색" />
       <TouchableOpacity onPress={togglehandler}>
-        <SearchIcon style={styles.icon} name="search" size={25} color="#000" />
+        <SearchIcon style={styles.icon} name="search" size={25} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   icon: {

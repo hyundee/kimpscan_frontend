@@ -23,9 +23,9 @@ export const ChartLegend = () => {
 const styles = StyleSheet.create({
   chartLegend: {
     position : 'relative',
-    alignSelf: 'flex-end',
-    marginBottom : 5,
-    marginRight: 5,
+    // alignSelf: 'flex-end',
+    // marginBottom : 5,
+    // marginRight: 5,
   },
   chartLegendText : {
     position: 'absolute',
