@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "537184596849",
+    "project_id": "kimpscan-49a52",
+    "storage_bucket": "kimpscan-49a52.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537184596849:android:f47bc4599606aa5ce03cd0",
+        "android_client_info": {
+          "package_name": "com.kimpscan_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa8UOY8bpYYr7yYfusRUPWmtl_ppy-vCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
