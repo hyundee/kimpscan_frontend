@@ -16,11 +16,10 @@ import {
   formatNumber,
   formatPrice,
 } from '../../utils/formatNumber';
-import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
-import { ChartLegend } from '../Legend/ChartLegend';
-import { useSelectedCoin } from '../../store/useSelectedCoin';
-import { SearchBar } from '../SearchBar/SearchBar';
-
+import {loadBookmarks, saveBookmarks} from '../../utils/bookmarkStorage';
+import {ChartLegend} from '../Legend/ChartLegend';
+import {useSelectedCoin} from '../../store/useSelectedCoin';
+import {SearchBar} from '../SearchBar/SearchBar';
 
 interface ITickerTable {
   data: Record<string, CoinInfo>;
@@ -33,9 +32,10 @@ export const TickerTable = ({data}: ITickerTable) => {
   const [bookMarks, setBookMarks] = useState<Record<string, boolean>>({});
   const kimpHistoryRef = useRef<Record<string, number>>({});
 
-  const [sortKey, setSortKey] = useState<'korName' | 'kimp' | 'volume' | null>(null);
+  const [sortKey, setSortKey] = useState<'korName' | 'kimp' | 'volume' | null>(
+    null,
+  );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
 
   useEffect(() => {
     setCoinList(data);
@@ -79,7 +79,9 @@ export const TickerTable = ({data}: ITickerTable) => {
   const bookmarkedFirst = baseData.sort((a, b) => {
     const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
     const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
-    if (aBookmarked === bBookmarked) {return 0;}
+    if (aBookmarked === bBookmarked) {
+      return 0;
+    }
     return aBookmarked ? -1 : 1;
   });
 
@@ -97,8 +99,12 @@ export const TickerTable = ({data}: ITickerTable) => {
         aValue = a.won24hVolume! + a.usdt24hVolume;
         bValue = b.won24hVolume! + b.usdt24hVolume;
       }
-      if (aValue < bValue) {return sortOrder === 'asc' ? -1 : 1;}
-      if (aValue > bValue) {return sortOrder === 'asc' ? 1 : -1;}
+      if (aValue < bValue) {
+        return sortOrder === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortOrder === 'asc' ? 1 : -1;
+      }
       return 0;
     });
   }
@@ -117,7 +123,10 @@ export const TickerTable = ({data}: ITickerTable) => {
 
     const currentKimp = Number(value.kimp);
     const previousKimp = kimpHistoryRef.current[coinSymbol!];
-    const kimpColor = previousKimp !== undefined && currentKimp > Number(previousKimp) ? 'red' : 'blue';
+    const kimpColor =
+      previousKimp !== undefined && currentKimp > Number(previousKimp)
+        ? 'red'
+        : 'blue';
 
     kimpHistoryRef.current[coinSymbol!] = currentKimp;
 
@@ -160,11 +169,10 @@ export const TickerTable = ({data}: ITickerTable) => {
   ) => {
     if (Array.isArray(cellData)) {
       return (
-          <View style={styles.cellContainer}>
-            <Text style={styles.strongText}>{cellData[0]}</Text>
-            <Text style={styles.smallText}>{cellData[1]}</Text>
-          </View>
-
+        <View style={styles.cellContainer}>
+          <Text style={styles.strongText}>{cellData[0]}</Text>
+          <Text style={styles.smallText}>{cellData[1]}</Text>
+        </View>
       );
     }
 
@@ -175,14 +183,14 @@ export const TickerTable = ({data}: ITickerTable) => {
     return <Text>-</Text>; // 예외 처리
   };
 
-  const handlePress = (symbol : string[]) => {
+  const handlePress = (symbol: string[]) => {
     const coinKey = symbol[0] + 'USDT';
     useSelectedCoin.getState().setCoin(coinKey);
   };
 
   const handleSearch = (text: string) => {
     setQuery(text);
-    const result = Object.values(coinList).filter((item) => {
+    const result = Object.values(coinList).filter(item => {
       return (
         item.korName!.toLowerCase().includes(text.toLowerCase()) ||
         item.rootSymbol!.toLowerCase().includes(text.toLowerCase())
@@ -203,13 +211,15 @@ export const TickerTable = ({data}: ITickerTable) => {
       </View>
       <ScrollView style={styles.scrollView}>
         <Table borderStyle={styles.tableBorder}>
-        <Row
+          <Row
             data={headerTitles.map((title, index) => {
               const key = sortKeys[index];
               const isSortable = key !== 'none';
 
               return isSortable ? (
-                <TouchableOpacity key={index} onPress={() => handleSort(key as any)}>
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleSort(key as any)}>
                   <Text style={styles.headerText}>
                     {title}
                     <SortIcon name="sort" size={15} style={styles.sort} />
@@ -217,7 +227,9 @@ export const TickerTable = ({data}: ITickerTable) => {
                   </Text>
                 </TouchableOpacity>
               ) : (
-                <Text key={index} style={styles.headerText}>{title}</Text>
+                <Text key={index} style={styles.headerText}>
+                  {title}
+                </Text>
               );
             })}
             style={styles.header}
@@ -226,23 +238,23 @@ export const TickerTable = ({data}: ITickerTable) => {
           />
           {tableData.map((rowData, rowIndex) => (
             <TableWrapper key={rowIndex} style={styles.row}>
-                {rowData.map((cellData, cellIndex) => (
-                  <Cell
-                      key={cellIndex}
-                      data={
-                        cellIndex === 0 ? (
-                          <TouchableOpacity
-                            onPress={() => handlePress(rowData[0] as string[])}>
-                            {renderCustomCell(cellData)}
-                          </TouchableOpacity>
-                        ) : (
-                          renderCustomCell(cellData)
-                        )
-                      }
-                      style={{flex: flexArr[cellIndex]}}
-                    />
-                ))}
-              </TableWrapper>
+              {rowData.map((cellData, cellIndex) => (
+                <Cell
+                  key={cellIndex}
+                  data={
+                    cellIndex === 0 ? (
+                      <TouchableOpacity
+                        onPress={() => handlePress(rowData[0] as string[])}>
+                        {renderCustomCell(cellData)}
+                      </TouchableOpacity>
+                    ) : (
+                      renderCustomCell(cellData)
+                    )
+                  }
+                  style={{flex: flexArr[cellIndex]}}
+                />
+              ))}
+            </TableWrapper>
           ))}
         </Table>
       </ScrollView>
@@ -260,15 +272,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     backgroundColor: '#000',
   },
-  top : {
-    position : 'relative',
-    marginTop : 10,
-    marginBottom : 5,
+  top: {
+    position: 'relative',
+    marginTop: 10,
+    marginBottom: 5,
     // marginHorizontal : 5,
     width: '100%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent : 'space-between',
+    justifyContent: 'space-between',
     flexDirection: 'row',
   },
   scrollView: {
@@ -318,7 +330,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // textAlign: 'center',
   },
-  sort : {
-    marginLeft : 3,
+  sort: {
+    marginLeft: 3,
   },
 });

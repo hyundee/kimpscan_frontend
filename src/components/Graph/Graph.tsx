@@ -2,8 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {ScrollView, StyleSheet, View, Dimensions} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
-import { useSelectedCoin } from '../../store/useSelectedCoin';
-import { GraphLegend } from '../Legend/GraphLegend';
+import {useSelectedCoin} from '../../store/useSelectedCoin';
+import {GraphLegend} from '../Legend/GraphLegend';
 
 export const Graph = () => {
   const coin = useSelectedCoin(state => state.coin);
@@ -12,25 +12,31 @@ export const Graph = () => {
   // const screenHeight = Dimensions.get('window').height; // 화면의 세로 크기
   const scrollRef = useRef<ScrollView>(null);
 
-  const [priceMovingAverage, setPriceMovingAverage] = useState<number[][]>([]);
+  // const [priceMovingAverage, setPriceMovingAverage] = useState<number[][]>([]);
   // const [webSocket, setWebSocket] = useState<number[]>([]);
   const [KimpPrice, setKimpPrice] = useState<number[]>([0]);
   const [ma5s, setMa5s] = useState<number[]>([0]);
   const [ma20s, setMa20s] = useState<number[]>([0]);
 
   useEffect(() => {
-      console.log('선택된 코인:', coin);
-      fetchData(coin);
-
+    console.log('선택된 코인:', coin);
+    fetchData(coin);
   }, [coin]);
 
-  const fetchData = async (symbol : string) => {
+  const fetchData = async (symbol: string) => {
     try {
       const response = await axios.get(
         `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
       );
-      console.log('Data:', response.data);
-      setPriceMovingAverage(response.data);
+      const raw = response.data;
+
+      const kimp = raw.map((item: number[]) => item[0]);
+      const ma5 = raw.map((item: number[]) => item[1]);
+      const ma20 = raw.map((item: number[]) => item[2]);
+
+      setKimpPrice(kimp);
+      setMa5s(ma5);
+      setMa20s(ma20);
     } catch (error) {
       console.error('Error fetching MovingAvgs data:', error);
     }
@@ -40,37 +46,32 @@ export const Graph = () => {
   //   fetchData();
   // }, []);
 
-  useEffect(() => {
-    if (priceMovingAverage.length > 0) {
-      setKimpPrice(priceMovingAverage.map((item: number[]) => item[0]));
-      setMa5s(priceMovingAverage.map((item: number[]) => item[1]));
-      setMa20s(priceMovingAverage.map((item: number[]) => item[2]));
-    }
-  }, [priceMovingAverage]);
+  // useEffect(() => {
+  //   if (priceMovingAverage.length > 0) {
+  //     setKimpPrice(priceMovingAverage.map((item: number[]) => item[0]));
+  //     setMa5s(priceMovingAverage.map((item: number[]) => item[1]));
+  //     setMa20s(priceMovingAverage.map((item: number[]) => item[2]));
+  //   }
+  // }, [priceMovingAverage]);
 
   useEffect(() => {
     ws.current = new WebSocket('wss://clarify.kr/ws/exchange/moving-avgs');
 
     ws.current.onopen = () => {
-      console.log('이동평균 웹소켓 연결 성공');
-      // ws.current.send(JSON.stringify('XRPUSDT'));
-      if (ws.current && ws.current.readyState === 1) {
-        ws.current.send(coin);
-        console.log('웹소켓 메시지 전송:', coin);
-      } else {
-        console.log('웹소켓이 아직 연결되지 않았거나 닫혀 있음.');
-      }
+      console.log('✅ 웹소켓 연결됨');
+      ws.current?.send(coin);
+      console.log('📤 웹소켓 전송:', coin);
     };
 
     ws.current.onmessage = event => {
-      if (event.data) {
-        const parsedData = JSON.parse(event.data);
+      if (!event.data) return;
 
-        // setWebSocket(parsedData);
-        setKimpPrice(prev => [...prev, parsedData[0]].slice(-20));
-        setMa5s(prev => [...prev, parsedData[1]].slice(-20));
-        setMa20s(prev => [...prev, parsedData[2]].slice(-20));
-      }
+      const parsedData = JSON.parse(event.data);
+      const [newKimp, newMa5, newMa20] = parsedData;
+
+      setKimpPrice(prev => [...prev, newKimp].slice(-20));
+      setMa5s(prev => [...prev, newMa5].slice(-20));
+      setMa20s(prev => [...prev, newMa20].slice(-20));
     };
 
     ws.current.onerror = error => {
@@ -82,9 +83,8 @@ export const Graph = () => {
     };
 
     return () => {
-      if (ws.current && ws.current.readyState === 1) {
-        ws.current.close();
-      }
+      console.log('🧹 웹소켓 정리');
+      ws.current?.close();
     };
   }, [coin]);
 
@@ -96,7 +96,7 @@ export const Graph = () => {
 
   // const chartWidth = Math.max(KimpPrice.length * 40, screenWidth);
   const labels = KimpPrice.map((_, index) =>
-    index === 0 || (index + 1) % 5 === 0 ? `${index + 1}초` : ''
+    index === 0 || (index + 1) % 5 === 0 ? `${index + 1}초` : '',
   );
 
   const data = {
@@ -123,26 +123,29 @@ export const Graph = () => {
   return (
     <View style={styles.container}>
       <GraphLegend />
-      <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} >
-          <LineChart
-            key={KimpPrice.length}
-            data={data}
-            width={screenWidth}
-            height={180}
-            withShadow={false}
-            withDots={false}
-            // segments={10}
-            // yLabelsOffset={30}
-            style={styles.graph}
-            chartConfig={{
-              formatYLabel: (yValue) => Number(yValue).toFixed(2),
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-            }}
-          />
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}>
+        <LineChart
+          key={KimpPrice.length}
+          data={data}
+          width={screenWidth}
+          height={180}
+          withShadow={false}
+          withDots={false}
+          // segments={10}
+          // yLabelsOffset={30}
+          style={styles.graph}
+          chartConfig={{
+            formatYLabel: yValue => Number(yValue).toFixed(2),
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+          }}
+        />
       </ScrollView>
     </View>
   );
