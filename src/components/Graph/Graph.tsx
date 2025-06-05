@@ -26,7 +26,7 @@ export const Graph = () => {
   const fetchData = async (symbol: string) => {
     try {
       const response = await axios.get(
-        `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
+        `https://api.kimpscan.com/exchange/moving-avgs/init?symbol=${symbol}`,
       );
       const raw = response.data;
 
@@ -55,7 +55,7 @@ export const Graph = () => {
   // }, [priceMovingAverage]);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://clarify.kr/ws/exchange/moving-avgs');
+    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/moving-avgs');
 
     ws.current.onopen = () => {
       console.log('✅ 웹소켓 연결됨');
