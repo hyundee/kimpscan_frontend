@@ -55,7 +55,11 @@ export const Graph = () => {
   // }, [priceMovingAverage]);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/moving-avgs');
+    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/moving-avgs', undefined, {
+      headers: {
+        'Origin': 'https://kimpscan.com',
+      }
+    });
 
     ws.current.onopen = () => {
       console.log('✅ 웹소켓 연결됨');

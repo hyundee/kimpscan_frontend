@@ -29,7 +29,11 @@ export const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/tickers');
+    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/tickers', undefined, {
+      headers: {
+        'Origin': 'https://kimpscan.com',
+      }
+    });
 
     ws.current.onopen = () => {
       console.log('웹소켓 연결 성공');
