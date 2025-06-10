@@ -5,57 +5,71 @@ import {LineChart} from 'react-native-chart-kit';
 import {useSelectedCoin} from '../../store/useSelectedCoin';
 import {GraphLegend} from '../Legend/GraphLegend';
 
-export const Graph = () => {
+export const Graph = React.memo(() => {
   const coin = useSelectedCoin(state => state.coin);
   const ws = useRef<WebSocket | null>(null);
-  const screenWidth = Dimensions.get('window').width; // 화면의 가로 크기
-  // const screenHeight = Dimensions.get('window').height; // 화면의 세로 크기
+  const screenWidth = Dimensions.get('window').width;
   const scrollRef = useRef<ScrollView>(null);
 
-  // const [priceMovingAverage, setPriceMovingAverage] = useState<number[][]>([]);
-  // const [webSocket, setWebSocket] = useState<number[]>([]);
+  const [initialData, setInitialData] = useState<{
+    kimp: number[];
+    ma5: number[];
+    ma20: number[];
+  } | null>(null);
+
   const [KimpPrice, setKimpPrice] = useState<number[]>([0]);
   const [ma5s, setMa5s] = useState<number[]>([0]);
   const [ma20s, setMa20s] = useState<number[]>([0]);
 
   useEffect(() => {
-    console.log('선택된 코인:', coin);
-    fetchData(coin);
-  }, [coin]);
+    if (!initialData) {
+      axios
+        .get(
+          `https://api.kimpscan.com/exchange/moving-avgs/init?symbol=${coin}`,
+        )
+        .then(res => {
+          const raw = res.data;
+          const kimp = raw.map((item: number[]) => item[0]);
+          const ma5 = raw.map((item: number[]) => item[1]);
+          const ma20 = raw.map((item: number[]) => item[2]);
 
-  const fetchData = async (symbol: string) => {
-    try {
-      const response = await axios.get(
-        `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
-      );
-      const raw = response.data;
-
-      const kimp = raw.map((item: number[]) => item[0]);
-      const ma5 = raw.map((item: number[]) => item[1]);
-      const ma20 = raw.map((item: number[]) => item[2]);
-
-      setKimpPrice(kimp);
-      setMa5s(ma5);
-      setMa20s(ma20);
-    } catch (error) {
-      console.error('Error fetching MovingAvgs data:', error);
+          setInitialData({kimp, ma5, ma20});
+        })
+        .catch(err => console.error('Error fetching:', err));
     }
-  };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-  //   if (priceMovingAverage.length > 0) {
-  //     setKimpPrice(priceMovingAverage.map((item: number[]) => item[0]));
-  //     setMa5s(priceMovingAverage.map((item: number[]) => item[1]));
-  //     setMa20s(priceMovingAverage.map((item: number[]) => item[2]));
-  //   }
-  // }, [priceMovingAverage]);
+  }, [coin, initialData]);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://clarify.kr/ws/exchange/moving-avgs');
+    if (initialData) {
+      setKimpPrice(initialData.kimp);
+      setMa5s(initialData.ma5);
+      setMa20s(initialData.ma20);
+    }
+  }, [initialData]);
+
+  // const fetchData = async (symbol: string) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
+  //     );
+  //     const raw = response.data;
+
+  //     const kimp = raw.map((item: number[]) => item[0]);
+  //     const ma5 = raw.map((item: number[]) => item[1]);
+  //     const ma20 = raw.map((item: number[]) => item[2]);
+
+  //     setKimpPrice(kimp);
+  //     setMa5s(ma5);
+  //     setMa20s(ma20);
+  //   } catch (error) {
+  //     console.error('Error fetching MovingAvgs data:', error);
+  //   }
+  // };
+
+  useEffect(() => {
+    ws.current = new WebSocket(
+      'wss://api.kimpscan.com/ws/exchange/moving-avgs',
+    );
 
     ws.current.onopen = () => {
       console.log('✅ 웹소켓 연결됨');
@@ -69,7 +83,12 @@ export const Graph = () => {
       const parsedData = JSON.parse(event.data);
       const [newKimp, newMa5, newMa20] = parsedData;
 
-      setKimpPrice(prev => [...prev, newKimp].slice(-20));
+      setKimpPrice(prev => {
+        console.trace('🔁 setKimpPrice triggered');
+        return [...prev, newKimp].slice(-20);
+      });
+
+      // setKimpPrice(prev => [...prev, newKimp].slice(-20));
       setMa5s(prev => [...prev, newMa5].slice(-20));
       setMa20s(prev => [...prev, newMa20].slice(-20));
     };
@@ -89,10 +108,11 @@ export const Graph = () => {
   }, [coin]);
 
   // useEffect(() => {
-  //   if (KimpPrice.length > 0) {
-  //     scrollRef.current?.scrollToEnd({ animated: true });
+  //   if (ws.current?.readyState === WebSocket.OPEN) {
+  //     ws.current.send(coin);
+  //     console.log('📤 심볼 전송:', coin);
   //   }
-  // }, [KimpPrice]);
+  // }, [coin]);
 
   // const chartWidth = Math.max(KimpPrice.length * 40, screenWidth);
   const labels = KimpPrice.map((_, index) =>
@@ -149,7 +169,7 @@ export const Graph = () => {
       </ScrollView>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

@@ -223,7 +223,6 @@ export const TickerTable = ({data}: ITickerTable) => {
                   <Text style={styles.headerText}>
                     {title}
                     <SortIcon name="sort" size={15} style={styles.sort} />
-                    {/* {sortKey === key && (sortOrder === 'asc' ? ' ↑' : ' ↓')} */}
                   </Text>
                 </TouchableOpacity>
               ) : (
