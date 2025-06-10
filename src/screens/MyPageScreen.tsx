@@ -1,21 +1,20 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+import {Notification} from '../components/Notification/Notifications';
 
 export const MyPageScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>MyPageScreen</Text>
+      <Notification />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 26,
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
+    // alignItems: 'center',
   },
 });
