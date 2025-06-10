@@ -304,8 +304,6 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    // borderWidth: 1,
-    // borderColor: '#C1C0B9',
   },
   cellContainer: {
     margin: 3,

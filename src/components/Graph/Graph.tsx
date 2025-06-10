@@ -51,9 +51,9 @@ export const Graph = React.memo(() => {
     );
 
     ws.current.onopen = () => {
-      console.log('✅ 웹소켓 연결됨');
+      console.log('웹소켓 연결됨');
       ws.current?.send(coin);
-      console.log('📤 웹소켓 전송:', coin);
+      console.log('웹소켓 전송:', coin);
     };
 
     ws.current.onmessage = event => {
@@ -79,7 +79,7 @@ export const Graph = React.memo(() => {
     };
 
     return () => {
-      console.log('🧹 웹소켓 정리');
+      console.log('웹소켓 정리');
       ws.current?.close();
     };
   }, [coin]);
@@ -150,16 +150,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
   },
-  // exchange: {
-  //   backgroundColor: 'red',
-  //   alignItems: 'flex-start',
-  //   justifyContent: 'center',
-  //   padding: 5,
-  //   borderTopWidth: 1,
-  // },
-  // exchangeText: {
-  //   color: '#000',
-  // },
   graph: {
     marginLeft: -20,
   },

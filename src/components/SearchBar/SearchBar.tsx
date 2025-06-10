@@ -1,29 +1,19 @@
 import React, {useState} from 'react';
 
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import {View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
 import SearchIcon from 'react-native-vector-icons/Ionicons';
 
 interface ISearchBar {
-  query : string,
-  handleSearch : (text : string) => void
+  query: string;
+  handleSearch: (text: string) => void;
 }
 
-export const SearchBar = ({query, handleSearch} : ISearchBar) => {
-  // const [isActiveSearchbar, setIsActiveSearchbar] = useState(false);
+export const SearchBar = ({query, handleSearch}: ISearchBar) => {
   const [text, setText] = useState(query);
 
   const togglehandler = () => {
     handleSearch(text);
   };
-
-  // const handleChangeText = (newText: string) => {
-  //   setText(newText);
-  // };
 
   return (
     <View style={styles.container}>
@@ -31,7 +21,8 @@ export const SearchBar = ({query, handleSearch} : ISearchBar) => {
         style={styles.input}
         value={text}
         onChangeText={setText}
-        placeholder="종목명을 입력하세요" />
+        placeholder="종목명을 입력하세요"
+      />
       <TouchableOpacity onPress={togglehandler}>
         <SearchIcon style={styles.icon} name="search" size={25} color="#fff" />
       </TouchableOpacity>

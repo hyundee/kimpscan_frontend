@@ -15,7 +15,7 @@ export const HomeScreen = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        'https://api.kimpscan.com/exchange/tickers/init?symbol=XRPUSDT',
+        'https://api.kimpscan.com/exchange/tickers/init',
       );
       console.log('Data:', response.data);
       setCoins(response.data);
@@ -30,38 +30,46 @@ export const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://clarify.kr/ws/exchange/tickers');
+    ws.current = new WebSocket(
+      'wss://api.kimpscan.com/ws/exchange/tickers',
+      undefined,
+      {
+        headers: {
+          Origin: 'https://kimpscan.com',
+        },
+      },
+    );
 
     ws.current.onopen = () => {
       console.log('웹소켓 연결 성공');
-      // setIsLoading(false);
+      // ws.current?.send(coins);
     };
 
     ws.current.onmessage = event => {
-      if (event.data) {
-        const parsedData =
-          typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+      if (!event.data) return;
 
-        setCoins(prev => ({
-          ...prev,
-          usdWonExRage: parsedData.usdWonExRage ?? prev?.usdWonExRage,
-          kimpTickerMap: {
-            ...prev?.kimpTickerMap,
-            ...Object.entries(parsedData.kimpTickerMap || {}).reduce(
-              (acc, [key, newCoinInfo]) => ({
-                ...acc,
-                [key]: {
-                  ...prev?.kimpTickerMap?.[key], // 기존 코인 정보 유지
-                  ...(typeof newCoinInfo === 'object' && newCoinInfo !== null
-                    ? newCoinInfo
-                    : {}), // 새로 받은 값만 업데이트
-                },
-              }),
-              {},
-            ),
-          },
-        }));
-      }
+      const parsedData =
+        typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+      setCoins(prev => ({
+        ...prev,
+        usdWonExRage: parsedData.usdWonExRage ?? prev?.usdWonExRage,
+        kimpTickerMap: {
+          ...prev?.kimpTickerMap,
+          ...Object.entries(parsedData.kimpTickerMap || {}).reduce(
+            (acc, [key, newCoinInfo]) => ({
+              ...acc,
+              [key]: {
+                ...prev?.kimpTickerMap?.[key], // 기존 코인 정보 유지
+                ...(typeof newCoinInfo === 'object' && newCoinInfo !== null
+                  ? newCoinInfo
+                  : {}), // 새로 받은 값만 업데이트
+              },
+            }),
+            {},
+          ),
+        },
+      }));
     };
 
     ws.current.onerror = error => {
@@ -73,11 +81,10 @@ export const HomeScreen = () => {
     };
 
     return () => {
-      if (ws.current && ws.current.readyState === 1) {
-        ws.current.close();
-      }
+      console.log('웹소켓 정리');
+      ws.current?.close();
     };
-  }, [coins]);
+  }, []);
 
   // console.log(coins);
 
