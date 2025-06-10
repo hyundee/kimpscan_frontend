@@ -26,14 +26,11 @@ export const HomeScreen = () => {
 
   useEffect(() => {
     fetchData();
+    console.log('fetchData 렌더링');
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/tickers', undefined, {
-      headers: {
-        'Origin': 'https://kimpscan.com',
-      }
-    });
+    ws.current = new WebSocket('wss://clarify.kr/ws/exchange/tickers');
 
     ws.current.onopen = () => {
       console.log('웹소켓 연결 성공');
@@ -80,16 +77,18 @@ export const HomeScreen = () => {
         ws.current.close();
       }
     };
-  }, []);
+  }, [coins]);
 
-  console.log(coins);
+  // console.log(coins);
 
   return (
     <View style={styles.container}>
       <View style={styles.exchange}>
         <Text>
           달러 원 환율 :
-          <Text style={styles.exchangeText}>{` ${(coins?.usdWonExRage).toFixed(0)}원`}</Text>
+          <Text style={styles.exchangeText}>{` ${(coins?.usdWonExRage).toFixed(
+            0,
+          )}원`}</Text>
         </Text>
       </View>
       <Graph />
@@ -114,7 +113,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   exchangeText: {
-    fontWeight : 'bold',
+    fontWeight: 'bold',
     // color: 'red',
   },
 });
