@@ -40,35 +40,14 @@ export const Graph = React.memo(() => {
   }, [coin, initialData]);
 
   useEffect(() => {
-    if (initialData) {
-      setKimpPrice(initialData.kimp);
-      setMa5s(initialData.ma5);
-      setMa20s(initialData.ma20);
-    }
-  }, [initialData]);
-
-  // const fetchData = async (symbol: string) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://clarify.kr/exchange/moving-avgs/init?symbol=${symbol}`,
-  //     );
-  //     const raw = response.data;
-
-  //     const kimp = raw.map((item: number[]) => item[0]);
-  //     const ma5 = raw.map((item: number[]) => item[1]);
-  //     const ma20 = raw.map((item: number[]) => item[2]);
-
-  //     setKimpPrice(kimp);
-  //     setMa5s(ma5);
-  //     setMa20s(ma20);
-  //   } catch (error) {
-  //     console.error('Error fetching MovingAvgs data:', error);
-  //   }
-  // };
-
-  useEffect(() => {
     ws.current = new WebSocket(
       'wss://api.kimpscan.com/ws/exchange/moving-avgs',
+      undefined,
+      {
+        headers: {
+          Origin: 'https://kimpscan.com',
+        },
+      },
     );
 
     ws.current.onopen = () => {

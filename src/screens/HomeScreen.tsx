@@ -15,7 +15,7 @@ export const HomeScreen = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        'https://clarify.kr/exchange/tickers/init?symbol=XRPUSDT',
+        'https://api.kimpscan.com/exchange/tickers/init?symbol=XRPUSDT',
       );
       console.log('Data:', response.data);
       setCoins(response.data);
@@ -29,7 +29,11 @@ export const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket('wss://clarify.kr/ws/exchange/tickers');
+    ws.current = new WebSocket('wss://api.kimpscan.com/ws/exchange/tickers', undefined, {
+      headers: {
+        'Origin': 'https://kimpscan.com',
+      }
+    });
 
     ws.current.onopen = () => {
       console.log('웹소켓 연결 성공');
@@ -78,7 +82,7 @@ export const HomeScreen = () => {
     };
   }, []);
 
-  // console.log(coins);
+  console.log(coins);
 
   return (
     <View style={styles.container}>
