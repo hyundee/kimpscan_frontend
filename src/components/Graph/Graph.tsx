@@ -63,11 +63,9 @@ export const Graph = React.memo(() => {
       const [newKimp, newMa5, newMa20] = parsedData;
 
       setKimpPrice(prev => {
-        console.trace('🔁 setKimpPrice triggered');
         return [...prev, newKimp].slice(-20);
       });
 
-      // setKimpPrice(prev => [...prev, newKimp].slice(-20));
       setMa5s(prev => [...prev, newMa5].slice(-20));
       setMa20s(prev => [...prev, newMa20].slice(-20));
     };
@@ -86,14 +84,6 @@ export const Graph = React.memo(() => {
     };
   }, [coin]);
 
-  // useEffect(() => {
-  //   if (ws.current?.readyState === WebSocket.OPEN) {
-  //     ws.current.send(coin);
-  //     console.log('📤 심볼 전송:', coin);
-  //   }
-  // }, [coin]);
-
-  // const chartWidth = Math.max(KimpPrice.length * 40, screenWidth);
   const labels = KimpPrice.map((_, index) =>
     index === 0 || (index + 1) % 5 === 0 ? `${index + 1}초` : '',
   );
@@ -104,17 +94,17 @@ export const Graph = React.memo(() => {
       {
         data: KimpPrice,
         color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
-        strokeWidth: 4, // 선의 두께
+        strokeWidth: 4,
       },
       {
         data: ma5s,
         color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
-        strokeWidth: 4, // 선의 두께
+        strokeWidth: 4,
       },
       {
         data: ma20s,
         color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-        strokeWidth: 4, // 선의 두께
+        strokeWidth: 4,
       },
     ],
   };
