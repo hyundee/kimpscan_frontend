@@ -1,14 +1,15 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {CoinInfo} from '../../types/coins';
-import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
+import { CoinInfo } from '../../types/coins';
+import { Table, Row, TableWrapper, Cell } from 'react-native-table-component';
 import Icon from 'react-native-vector-icons/AntDesign';
 import SortIcon from 'react-native-vector-icons/FontAwesome';
 import {
@@ -16,16 +17,16 @@ import {
   formatNumber,
   formatPrice,
 } from '../../utils/formatNumber';
-import {loadBookmarks, saveBookmarks} from '../../utils/bookmarkStorage';
-import {ChartLegend} from '../Legend/ChartLegend';
-import {useSelectedCoin} from '../../store/useSelectedCoin';
-import {SearchBar} from '../SearchBar/SearchBar';
+import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
+import { ChartLegend } from '../Legend/ChartLegend';
+import { useSelectedCoin } from '../../store/useSelectedCoin';
+import { SearchBar } from '../SearchBar/SearchBar';
 
 interface ITickerTable {
   data: Record<string, CoinInfo>;
 }
 
-export const TickerTable = ({data}: ITickerTable) => {
+export const TickerTable = ({ data }: ITickerTable) => {
   const [coinList, setCoinList] = useState<Record<string, CoinInfo>>({});
   const [query, setQuery] = useState('');
   const [filteredData, setFilteredData] = useState<CoinInfo[]>([]);
@@ -36,6 +37,7 @@ export const TickerTable = ({data}: ITickerTable) => {
     null,
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [tableData, setTableData] = useState<(React.JSX.Element | (string | undefined)[] | (string | React.JSX.Element)[])[][]>();
 
   useEffect(() => {
     setCoinList(data);
@@ -74,92 +76,96 @@ export const TickerTable = ({data}: ITickerTable) => {
     }
   };
 
-  const baseData = query ? filteredData : Object.values(coinList);
+  useEffect(() => {
+    const baseData = query ? filteredData : Object.values(coinList);
 
-  const bookmarkedFirst = baseData.sort((a, b) => {
-    const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
-    const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
-    if (aBookmarked === bBookmarked) {
-      return 0;
-    }
-    return aBookmarked ? -1 : 1;
-  });
-
-  if (sortKey) {
-    bookmarkedFirst.sort((a, b) => {
-      let aValue: number | string = '';
-      let bValue: number | string = '';
-      if (sortKey === 'korName') {
-        aValue = a.korName!;
-        bValue = b.korName!;
-      } else if (sortKey === 'kimp') {
-        aValue = Number(a.kimp);
-        bValue = Number(b.kimp);
-      } else if (sortKey === 'volume') {
-        aValue = a.won24hVolume! + a.usdt24hVolume;
-        bValue = b.won24hVolume! + b.usdt24hVolume;
+    const bookmarkedFirst = baseData.sort((a, b) => {
+      const aBookmarked = bookMarks[a.rootSymbol!] ?? false;
+      const bBookmarked = bookMarks[b.rootSymbol!] ?? false;
+      if (aBookmarked === bBookmarked) {
+        return 0;
       }
-      if (aValue < bValue) {
-        return sortOrder === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortOrder === 'asc' ? 1 : -1;
-      }
-      return 0;
+      return aBookmarked ? -1 : 1;
     });
-  }
 
-  const sortedCoinList = bookmarkedFirst;
+    if (sortKey) {
+      bookmarkedFirst.sort((a, b) => {
+        let aValue: number | string = '';
+        let bValue: number | string = '';
+        if (sortKey === 'korName') {
+          aValue = a.korName!;
+          bValue = b.korName!;
+        } else if (sortKey === 'kimp') {
+          aValue = Number(a.kimp);
+          bValue = Number(b.kimp);
+        } else if (sortKey === 'volume') {
+          aValue = a.won24hVolume! + a.usdt24hVolume;
+          bValue = b.won24hVolume! + b.usdt24hVolume;
+        }
+        if (aValue < bValue) {
+          return sortOrder === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortOrder === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    const sortedCoinList = bookmarkedFirst;
+
+    const newTableData =
+      sortedCoinList.map(value => {
+        const coinSymbol = value.rootSymbol;
+        const wonPrice = formatPrice(value.wonPrice);
+        const usdtPrice = formatInteger(value.usdtPrice);
+        const finalUsdtPrice =
+          usdtPrice < 10 ? Number(value.usdtPrice).toFixed(4) : usdtPrice;
+
+        const currentKimp = Number(value.kimp);
+        const previousKimp = kimpHistoryRef.current[coinSymbol!];
+        const kimpColor =
+          previousKimp !== undefined && currentKimp > Number(previousKimp)
+            ? 'red'
+            : 'blue';
+
+        kimpHistoryRef.current[coinSymbol!] = currentKimp;
+
+        const kimpValue = Number(value.kimp).toFixed(3);
+        const finalKimpPrice = <Text style={{ color: kimpColor }}>{kimpValue}%</Text>;
+        const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
+
+        const won24hVolume = formatInteger(value.won24hVolume);
+        const usdt24hVolume = formatInteger(value.usdt24hVolume);
+        const volumeRatio = `${Math.floor((won24hVolume / usdt24hVolume) * 100)}%`;
+        const volumeRatioText = `${formatNumber(won24hVolume)}/${formatNumber(
+          usdt24hVolume,
+        )}`;
+
+        const bookMarkButton = (
+          <TouchableOpacity
+            style={styles.bookmarkContainer}
+            onPress={() => toggleBookMark(coinSymbol)}>
+            <Icon
+              name={bookMarks[coinSymbol!] ? 'star' : 'staro'}
+              size={20}
+              color="#000"
+            />
+          </TouchableOpacity>
+        );
+
+        return [
+          [coinSymbol, value.korName],
+          [finalKimpPrice, kimpPriceText],
+          [volumeRatio, volumeRatioText],
+          bookMarkButton,
+        ];
+      });
+    setTableData(newTableData);
+  }, [query, filteredData, coinList, bookMarks])
 
   const headerTitles = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
   const sortKeys = ['korName', 'kimp', 'volume', 'none'];
-
-  const tableData = sortedCoinList.map(value => {
-    const coinSymbol = value.rootSymbol;
-    const wonPrice = formatPrice(value.wonPrice);
-    const usdtPrice = formatInteger(value.usdtPrice);
-    const finalUsdtPrice =
-      usdtPrice < 10 ? Number(value.usdtPrice).toFixed(4) : usdtPrice;
-
-    const currentKimp = Number(value.kimp);
-    const previousKimp = kimpHistoryRef.current[coinSymbol!];
-    const kimpColor =
-      previousKimp !== undefined && currentKimp > Number(previousKimp)
-        ? 'red'
-        : 'blue';
-
-    kimpHistoryRef.current[coinSymbol!] = currentKimp;
-
-    const kimpValue = Number(value.kimp).toFixed(3);
-    const finalKimpPrice = <Text style={{color: kimpColor}}>{kimpValue}%</Text>;
-    const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
-
-    const won24hVolume = formatInteger(value.won24hVolume);
-    const usdt24hVolume = formatInteger(value.usdt24hVolume);
-    const volumeRatio = `${Math.floor((won24hVolume / usdt24hVolume) * 100)}%`;
-    const volumeRatioText = `${formatNumber(won24hVolume)}/${formatNumber(
-      usdt24hVolume,
-    )}`;
-
-    const bookMarkButton = (
-      <TouchableOpacity
-        style={styles.bookmarkContainer}
-        onPress={() => toggleBookMark(coinSymbol)}>
-        <Icon
-          name={bookMarks[coinSymbol!] ? 'star' : 'staro'}
-          size={20}
-          color="#000"
-        />
-      </TouchableOpacity>
-    );
-
-    return [
-      [coinSymbol, value.korName],
-      [finalKimpPrice, kimpPriceText],
-      [volumeRatio, volumeRatioText],
-      bookMarkButton,
-    ];
-  });
 
   const renderCustomCell = (
     cellData:
@@ -190,6 +196,8 @@ export const TickerTable = ({data}: ITickerTable) => {
 
   const handleSearch = (text: string) => {
     setQuery(text);
+    if (text === "") return;
+
     const result = Object.values(coinList).filter(item => {
       return (
         item.korName!.toLowerCase().includes(text.toLowerCase()) ||
@@ -210,7 +218,9 @@ export const TickerTable = ({data}: ITickerTable) => {
         <ChartLegend />
       </View>
       <ScrollView style={styles.scrollView}>
-        <Table borderStyle={styles.tableBorder}>
+        {/* ScrollView BorderStyle 에러로 주석 */}
+        {/* <Table borderStyle={styles.tableBorder}> */}
+        <Table>
           <Row
             data={headerTitles.map((title, index) => {
               const key = sortKeys[index];
@@ -235,26 +245,34 @@ export const TickerTable = ({data}: ITickerTable) => {
             textStyle={styles.headerText}
             flexArr={flexArr}
           />
-          {tableData.map((rowData, rowIndex) => (
-            <TableWrapper key={rowIndex} style={styles.row}>
-              {rowData.map((cellData, cellIndex) => (
-                <Cell
-                  key={cellIndex}
-                  data={
-                    cellIndex === 0 ? (
-                      <TouchableOpacity
-                        onPress={() => handlePress(rowData[0] as string[])}>
-                        {renderCustomCell(cellData)}
-                      </TouchableOpacity>
-                    ) : (
-                      renderCustomCell(cellData)
-                    )
-                  }
-                  style={{flex: flexArr[cellIndex]}}
-                />
-              ))}
-            </TableWrapper>
-          ))}
+          <FlatList
+            data={tableData}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item: rowData, index: rowIndex }) => (
+              <TableWrapper key={rowIndex} style={styles.row}>
+                {rowData.map((cellData, cellIndex) => (
+                  <Cell
+                    key={cellIndex}
+                    data={
+                      cellIndex === 0 ? (
+                        <TouchableOpacity
+                          onPress={() => handlePress(rowData[0] as string[])}>
+                          {renderCustomCell(cellData)}
+                        </TouchableOpacity>
+                      ) : (
+                        renderCustomCell(cellData)
+                      )
+                    }
+                    style={{ flex: flexArr[cellIndex] }}
+                  />
+                ))}
+              </TableWrapper>
+            )}
+            initialNumToRender={20}
+            maxToRenderPerBatch={10}
+            windowSize={21}
+            scrollEnabled={false}
+          />
         </Table>
       </ScrollView>
     </View>
