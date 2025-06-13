@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import {View, StyleSheet, Text} from 'react-native';
-import {TickerTable} from '../components/Table/TickerTable';
-import {Graph} from '../components/Graph/Graph';
-import {Coins} from '../types/coins';
+import { View, StyleSheet, Text } from 'react-native';
+import { TickerTable } from '../components/Table/TickerTable';
+import { Graph } from '../components/Graph/Graph';
+import { Coins } from '../types/coins';
 
 export const HomeScreen = () => {
   const ws = useRef<WebSocket | null>(null);
@@ -11,6 +11,8 @@ export const HomeScreen = () => {
     usdWonExRage: 0,
     kimpTickerMap: {},
   });
+  const [isDiffCoin, setIsDiffCoin] = useState<boolean>(false);
+  const [isAfterInit, setIsAfterInit] = useState<boolean>(false);
 
   const fetchData = async () => {
     try {
@@ -19,6 +21,8 @@ export const HomeScreen = () => {
       );
       console.log('Data:', response.data);
       setCoins(response.data);
+      setIsDiffCoin(false);
+      setIsAfterInit(true);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -30,6 +34,10 @@ export const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
+    if (!isAfterInit) {
+      return;
+    }
+
     ws.current = new WebSocket(
       'wss://api.kimpscan.com/ws/exchange/tickers',
       undefined,
@@ -51,25 +59,8 @@ export const HomeScreen = () => {
       const parsedData =
         typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-      setCoins(prev => ({
-        ...prev,
-        usdWonExRage: parsedData.usdWonExRage ?? prev?.usdWonExRage,
-        kimpTickerMap: {
-          ...prev?.kimpTickerMap,
-          ...Object.entries(parsedData.kimpTickerMap || {}).reduce(
-            (acc, [key, newCoinInfo]) => ({
-              ...acc,
-              [key]: {
-                ...prev?.kimpTickerMap?.[key], // 기존 코인 정보 유지
-                ...(typeof newCoinInfo === 'object' && newCoinInfo !== null
-                  ? newCoinInfo
-                  : {}), // 새로 받은 값만 업데이트
-              },
-            }),
-            {},
-          ),
-        },
-      }));
+      setCoins(parsedData);
+      setIsDiffCoin(true);
     };
 
     ws.current.onerror = error => {
@@ -84,9 +75,9 @@ export const HomeScreen = () => {
       console.log('웹소켓 정리');
       ws.current?.close();
     };
-  }, []);
+  }, [isAfterInit]);
 
-  // console.log(coins);
+  console.log(coins);
 
   return (
     <View style={styles.container}>
@@ -98,8 +89,8 @@ export const HomeScreen = () => {
           )}원`}</Text>
         </Text>
       </View>
-      <Graph />
-      <TickerTable data={coins.kimpTickerMap} />
+      {/* <Graph /> */}
+      <TickerTable data={coins.kimpTickerMap} isDiffCoin={isDiffCoin} />
     </View>
   );
 };
