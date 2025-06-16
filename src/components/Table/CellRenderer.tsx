@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useMemo } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import { ITableDataRow } from '../../types/CoinTable';
 
-const CELL_DATA_TYPES = ["symbol", "kimpPrice", "volumeRatio", ] as const;
+const CELL_DATA_TYPES = ["symbol", "kimpPrice", "volumeRatio",] as const;
 type TCellDataType = typeof CELL_DATA_TYPES[number];
 
 interface CellRendererProps {
@@ -17,10 +17,10 @@ const renderCellContent = ({ cellDataType, cellData }: CellRendererProps) => {
   if (cellDataType === "kimpPrice" && Array.isArray(cellData) && cellData.length >= 3) {
     return (
       <View style={styles.cellContainer}>
-        <Text style={styles.strongText}>
+        <Text style={[styles.rowText, styles.strongText]}>
           <Text style={{ color: cellData[0] }}>{cellData[1]}%</Text>
         </Text>
-        <Text style={styles.smallText}>{cellData[2]}</Text>
+        <Text style={[styles.rowText, styles.smallText]}>{cellData[2]}</Text>
       </View>
     );
   }
@@ -29,8 +29,8 @@ const renderCellContent = ({ cellDataType, cellData }: CellRendererProps) => {
   if (Array.isArray(cellData) && cellData.length >= 2) {
     return (
       <View style={styles.cellContainer}>
-        <Text style={styles.strongText}>{cellData[0]}</Text>
-        <Text style={styles.smallText}>{cellData[1]}</Text>
+        <Text style={[styles.rowText, styles.strongText]}>{cellData[0]}</Text>
+        <Text style={[styles.rowText, styles.smallText]}>{cellData[1]}</Text>
       </View>
     );
   }
@@ -39,14 +39,11 @@ const renderCellContent = ({ cellDataType, cellData }: CellRendererProps) => {
     return cellData;
   }
 
-  return <Text>-</Text>; // 예외 처리
+  return <Text style={styles.rowText}>-</Text>; // 예외 처리
 };
 
 const CellRenderer = (props: CellRendererProps) => {
-  let cellKey = props.cellData
-  if (Array.isArray(props.cellData)) {
-    cellKey = props.cellData.join('|');
-  }
+  let cellKey = props.cellData.join('|');
 
   const memoizedContent = useMemo(() => {
     return renderCellContent(props);
@@ -70,4 +67,7 @@ const styles = StyleSheet.create({
   smallText: {
     fontSize: 12,
   },
+  rowText: {
+    color: '#fff',
+  }
 });
