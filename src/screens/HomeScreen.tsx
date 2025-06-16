@@ -89,7 +89,7 @@ export const HomeScreen = () => {
           )}원`}</Text>
         </Text>
       </View>
-      {/* <Graph /> */}
+      <Graph />
       <TickerTable data={coins.kimpTickerMap} isDiffCoin={isDiffCoin} />
     </View>
   );
