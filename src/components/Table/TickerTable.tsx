@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { CoinInfo } from '../../types/coins';
-import { Table, Row, TableWrapper, Cell } from 'react-native-table-component';
+import { FlashList } from "@shopify/flash-list";
 import Icon from 'react-native-vector-icons/AntDesign';
 import SortIcon from 'react-native-vector-icons/FontAwesome';
 import {
@@ -20,7 +19,6 @@ import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
 import { ChartLegend } from '../Legend/ChartLegend';
 import { useSelectedCoin } from '../../store/useSelectedCoin';
 import { SearchBar } from '../SearchBar/SearchBar';
-import { crc32 } from '../../utils/crc';
 import { ITableDataRow } from '../../types/CoinTable';
 import CellRenderer from './CellRenderer';
 
@@ -176,7 +174,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     // console.log('value.korName', value.korName);
 
     const tableDataRow: ITableDataRow = {
-      rowHash: getCoinInfoHash(value),
       symbol: [coinSymbol ?? "", value.korName ?? ""],
       kimpPrice: [kimpColor, kimpValue, kimpPriceText],
       volumeRatio: [volumeRatio, volumeRatioText],
@@ -185,7 +182,7 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     return tableDataRow;
   }
 
-  const toggleBookMark = (symbol?: string) => {
+  const toggleBookMark = useCallback((symbol?: string) => {
     if (symbol) {
       setBookMarks(prev => {
         const updated = {
@@ -196,15 +193,17 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
         return updated;
       });
     }
-  };
+  }, []);
 
-  const getCoinInfoHash = (info: CoinInfo) => {
-    const str = Object.values(info ?? {})
-      .map(value => value ?? '')
-      .join('|');
-
-    return crc32(str).toString(16).padStart(8, '0');
-  }
+  const StarIcon = React.memo(({ isBookmarked }: { isBookmarked: boolean }) => {
+    return (
+      <Icon
+        name={isBookmarked ? 'star' : 'staro'}
+        size={20}
+        color="#fff"
+      />
+    );
+  });
 
   const handleSort = (key: 'korName' | 'kimp' | 'volume') => {
     if (sortKey === key) {
@@ -218,10 +217,10 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
   const headerTitles = ['종목명', '김프', '거래비율', '즐겨\n찾기'];
   const sortKeys = ['korName', 'kimp', 'volume', 'none'];
 
-  const handlePress = (symbol: string[]) => {
+  const handlePress = useCallback((symbol: string[]) => {
     const coinKey = symbol[0] + 'USDT';
     useSelectedCoin.getState().setCoin(coinKey);
-  };
+  }, []);
 
   const handleSearch = (text: string) => {
     setQuery(text);
@@ -239,90 +238,80 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
   // console.log(data, tableData);
   const flexArr = [2, 2, 2, 1];
 
+  const renderHeader = () => {
+    return <View style={styles.row}>
+      {headerTitles.map((title, index) => {
+        const key = sortKeys[index];
+        const isSortable = key !== 'none';
+
+        return isSortable ? (
+          <TouchableOpacity
+            key={`thead-${index}`}
+            style={{ flex: flexArr[index] }}
+            onPress={() => handleSort(key as any)}>
+            <Text style={styles.headerText}>
+              {title}
+              <SortIcon name="sort" size={15} style={styles.sort} />
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View key={`thead-${index}`} style={{ flex: flexArr[index] }}>
+            <Text style={styles.headerText}>{title}</Text>
+          </View>
+        );
+      })}
+    </View>
+  }
+
+  const renderItem = ({ item }: { item: ITableDataRow }) => {
+    return <View style={styles.row}>
+      <View style={{ flex: flexArr[0] }}>
+        <TouchableOpacity
+          onPress={() => handlePress(item.symbol)}>
+          <CellRenderer cellData={item.symbol} cellDataType={"symbol"} />
+        </TouchableOpacity>
+      </View>
+      <View style={{ flex: flexArr[1] }}>
+        <CellRenderer cellData={item.kimpPrice} cellDataType={"kimpPrice"} />
+      </View>
+      <View style={{ flex: flexArr[2] }}>
+        <CellRenderer cellData={item.volumeRatio} cellDataType={"volumeRatio"} />
+      </View>
+      <View style={{ flex: flexArr[3] }}>
+        <TouchableOpacity
+          style={styles.bookmarkContainer}
+          onPress={() => toggleBookMark(item.symbol[0])}>
+          <StarIcon isBookmarked={bookMarks[item.symbol[0]]} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <SearchBar query={query} handleSearch={handleSearch} />
         <ChartLegend />
       </View>
-      <ScrollView style={styles.scrollView}>
-        {/* ScrollView BorderStyle 에러로 주석 */}
-        {/* <Table borderStyle={styles.tableBorder}> */}
-        <Table>
-          <Row
-            data={headerTitles.map((title, index) => {
-              const key = sortKeys[index];
-              const isSortable = key !== 'none';
-
-              return isSortable ? (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleSort(key as any)}>
-                  <Text style={styles.headerText}>
-                    {title}
-                    <SortIcon name="sort" size={15} style={styles.sort} />
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <Text key={index} style={styles.headerText}>
-                  {title}
-                </Text>
-              );
-            })}
-            style={styles.header}
-            textStyle={styles.headerText}
-            flexArr={flexArr}
-          />
-          {tableData.map((item) => (
-            <TableWrapper key={`${item.rowHash}-wrap`} style={styles.row}>
-              <Cell
-                key={`${item.rowHash}-0`}
-                data={
-                  <TouchableOpacity
-                    onPress={() => handlePress(item.symbol)}>
-                    <CellRenderer cellData={item.symbol} cellDataType={"symbol"} />
-                  </TouchableOpacity>
-                }
-                style={{ flex: flexArr[0] }}
-              />
-              <Cell
-                key={`${item.rowHash}-1`}
-                data={
-                  <CellRenderer cellData={item.kimpPrice} cellDataType={"kimpPrice"} />
-                }
-                style={{ flex: flexArr[1] }}
-              />
-              <Cell
-                key={`${item.rowHash}-2`}
-                data={
-                  <CellRenderer cellData={item.volumeRatio} cellDataType={"volumeRatio"} />
-                }
-                style={{ flex: flexArr[2] }}
-              />
-              <Cell
-                key={`${item.rowHash}-3`}
-                data={
-                  <TouchableOpacity
-                    style={styles.bookmarkContainer}
-                    onPress={() => toggleBookMark(item.symbol[0])}>
-                    <Icon
-                      name={bookMarks[item.symbol[0]] ? 'star' : 'staro'}
-                      size={20}
-                      color="#000"
-                    />
-                  </TouchableOpacity>
-                }
-                style={{ flex: flexArr[3] }}
-              />
-            </TableWrapper>
-          ))}
-        </Table>
-      </ScrollView>
+      <FlashList
+        style={styles.scrollView}
+        data={tableData}
+        keyExtractor={(item) => item.symbol[0]}
+        renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // backgroundColor: '#eee',
+  },
   container: {
     flex: 2,
     width: '100%',
@@ -362,9 +351,6 @@ const styles = StyleSheet.create({
   },
   textCenter: {
     textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
   },
   bookmark: {
     // width: '100%',
