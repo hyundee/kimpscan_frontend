@@ -122,8 +122,8 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
           aValue = Number(a.kimp);
           bValue = Number(b.kimp);
         } else if (sortKey === 'volume') {
-          aValue = Number(a.won24hVolume) + Number(a.usdt24hVolume);
-          bValue = Number(b.won24hVolume) + Number(b.usdt24hVolume);
+          aValue = Number(a.won24hVolume) / Number(a.usdt24hVolume);
+          bValue = Number(b.won24hVolume) / Number(b.usdt24hVolume);
         }
         if (aValue < bValue) {
           return sortOrder === 'asc' ? -1 : 1;
