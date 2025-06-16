@@ -39,6 +39,10 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [tableData, setTableData] = useState<ITableDataRow[]>([]);
+  const prevQueryRef = useRef(query);
+  const prevBookMarksRef = useRef(bookMarks);
+  const prevSortKeyRef = useRef(sortKey);
+  const prevSortOrderRef = useRef(sortOrder);
 
   useEffect(() => {
     // 최초 데이터 갱신
@@ -73,57 +77,94 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
   }, [initCoinList, data, isDiffCoin])
 
   useEffect(() => {
-    // 필터
-    const lowerCaseQuery = query.toLowerCase()
-    const filteredData = Object.values(coinList).filter(item => {
-      const korName = item.korName?.toLowerCase() || '';
-      const rootSymbol = item.rootSymbol?.toLowerCase() || '';
-      return korName.includes(lowerCaseQuery) || rootSymbol.includes(lowerCaseQuery);
-    })
+    const queryChanged = prevQueryRef.current !== query;
+    const bookMarksChanged = !isBookmarkEqual(prevBookMarksRef.current, bookMarks);
+    const sortKeyChanged = prevSortKeyRef.current !== sortKey;
+    const sortOrderChanged = prevSortOrderRef.current !== sortOrder;
 
-    // 정렬
-    // filteredData.sort((a, b) => {
-    //   let aValue: number | string = '';
-    //   let bValue: number | string = '';
-    //   if (sortKey === 'korName') {
-    //     aValue = a.korName!;
-    //     bValue = b.korName!;
-    //   } else if (sortKey === 'kimp') {
-    //     aValue = Number(a.kimp);
-    //     bValue = Number(b.kimp);
-    //   } else if (sortKey === 'volume') {
-    //     aValue = Number(a.won24hVolume) + Number(a.usdt24hVolume);
-    //     bValue = Number(b.won24hVolume) + Number(b.usdt24hVolume);
-    //   }
-    //   if (aValue < bValue) {
-    //     return sortOrder === 'asc' ? -1 : 1;
-    //   }
-    //   if (aValue > bValue) {
-    //     return sortOrder === 'asc' ? 1 : -1;
-    //   }
-    //   return 0;
-    // });
+    console.log('queryChanged', queryChanged);
+    console.log('bookMarksChanged', bookMarksChanged);
+    console.log('sortKeyChanged', sortKeyChanged);
+    console.log('sortOrderChanged', sortOrderChanged);
 
-    // 북마크
-    console.log('filteredData', filteredData);
+    if (queryChanged || bookMarksChanged || sortKeyChanged || sortOrderChanged) {
+      const lowerCaseQuery = query.toLowerCase()
+      const bookMarkTableData: ITableDataRow[] = []
+      const filteredData: CoinInfo[] = []
+      for (const [symbol, info] of Object.entries(coinList)) {
+        const rootSymbol = info.rootSymbol || '';
+        const lowerRootSymbol = rootSymbol.toLowerCase();
+        const lowerKorName = info.korName?.toLowerCase() || '';
 
-    setTableData(prevTableData => {
-      const newTableData: ITableDataRow[] = [];
-      console.log('prevTableData', prevTableData);
+        // currentKimp 갱신
+        updateCurrentKimp(info.kimp ?? "0", symbol)
 
-      for (const value of prevTableData) {
-        const symbol = `${value.symbol[0]}USDT`
-        if (symbol in coinList) {
-          const newValue = coinList[symbol]
-          newTableData.push(getTableDataRow(newValue))
-        } else {
-          newTableData.push(value)
+        // 북마크
+        if (bookMarks[rootSymbol]) {
+          bookMarkTableData.push(getTableDataRow(info))
+          continue
+        }
+
+        // 필터
+        if (lowerKorName.includes(lowerCaseQuery) || lowerRootSymbol.includes(lowerCaseQuery)) {
+          filteredData.push(info)
         }
       }
+      console.log('bookMarkTableData', bookMarkTableData);
 
-      return newTableData;
-    });
+      filteredData.sort((a, b) => {
+        let aValue: number | string = '';
+        let bValue: number | string = '';
+        if (sortKey === 'korName') {
+          aValue = a.korName!;
+          bValue = b.korName!;
+        } else if (sortKey === 'kimp') {
+          aValue = Number(a.kimp);
+          bValue = Number(b.kimp);
+        } else if (sortKey === 'volume') {
+          aValue = Number(a.won24hVolume) + Number(a.usdt24hVolume);
+          bValue = Number(b.won24hVolume) + Number(b.usdt24hVolume);
+        }
+        if (aValue < bValue) {
+          return sortOrder === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortOrder === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
 
+      setTableData(
+        bookMarkTableData.concat(filteredData.map(item => getTableDataRow(item)))
+      )
+      console.log("IN !!!!!!!!!! ")
+    } else {
+      setTableData(prevTableData => {
+        const newTableData: ITableDataRow[] = [];
+
+        for (const value of prevTableData) {
+          const symbol = `${value.symbol[0]}USDT`
+          const kimp = value.kimpPrice[1];
+          updateCurrentKimp(kimp, symbol)
+
+          if (symbol in coinList) {
+            const newValue = coinList[symbol]
+            newTableData.push(getTableDataRow(newValue))
+          } else {
+            newTableData.push(value)
+          }
+        }
+
+        return newTableData;
+      });
+
+      console.log("OUT !!!!!!!!!! ")
+    }
+
+    prevQueryRef.current = query;
+    prevBookMarksRef.current = bookMarks;
+    prevSortKeyRef.current = sortKey;
+    prevSortOrderRef.current = sortOrder;
 
     console.log("coinList", coinList)
     console.log('sortKey', sortKey);
@@ -131,18 +172,36 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     console.log('bookMarks', bookMarks);
     console.log('query', query);
     console.log('',);
-  }, [coinList, sortKey, sortOrder, query])
 
-  useEffect(() => {
-    Object.entries(coinList).forEach(([symbol, info]) => {
-      const currentKimp = Number(info.kimp);
-      kimpHistoryRef.current[symbol] = currentKimp;
-    });
-  }, [coinList]);
+  }, [coinList, query, bookMarks, sortKey, sortOrder])
 
   useEffect(() => {
     loadBookmarks().then(setBookMarks);
   }, []);
+
+  const isBookmarkEqual = (
+    prev: Record<string, boolean>,
+    next: Record<string, boolean>
+  ): boolean => {
+    const prevSet = new Set(Object.keys(prev).filter(key => prev[key]));
+    const nextSet = new Set(Object.keys(next).filter(key => next[key]));
+
+    if (prevSet.size !== nextSet.size) {
+      return false;
+    }
+
+    for (const prevItem of prevSet) {
+      if (!nextSet.has(prevItem)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  const updateCurrentKimp = (kimp: string, symbol: string) => {
+    const currentKimp = Number(kimp);
+    kimpHistoryRef.current[symbol] = currentKimp;
+  }
 
   const getTableDataRow = (value: CoinInfo) => {
     const coinSymbol = value.rootSymbol;
@@ -169,9 +228,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     const volumeRatioText = `${formatNumber(won24hVolume)}/${formatNumber(
       usdt24hVolume,
     )}`;
-
-    // console.log('coinSymbol', coinSymbol);
-    // console.log('value.korName', value.korName);
 
     const tableDataRow: ITableDataRow = {
       symbol: [coinSymbol ?? "", value.korName ?? ""],
@@ -224,14 +280,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
 
   const handleSearch = (text: string) => {
     setQuery(text);
-    if (text === "") return;
-
-    const result = Object.values(coinList).filter(item => {
-      return (
-        item.korName!.toLowerCase().includes(text.toLowerCase()) ||
-        item.rootSymbol!.toLowerCase().includes(text.toLowerCase())
-      );
-    });
   };
 
   // console.log(filteredData);
@@ -310,7 +358,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor: '#eee',
   },
   container: {
     flex: 2,
