@@ -13,14 +13,16 @@ export const Notification = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>- 알람</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setActive(prev => !prev)}>
-        <Text style={styles.buttonText}>알람 추가 +</Text>
-      </TouchableOpacity>
+      <View style={styles.alarmControls}>
+        <Text style={styles.text}>- 알람</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setActive(prev => !prev)}>
+          <Text style={styles.buttonText}>알람 추가 +</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableWithoutFeedback onPress={() => active && setActive(false)}>
-        <View>{active && <NotificationModal />}</View>
+        <View style={styles.alarmModal}>{active && <NotificationModal />}</View>
       </TouchableWithoutFeedback>
     </View>
   );
@@ -28,11 +30,17 @@ export const Notification = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // width: '100%',
-    padding: 20,
     flex: 1,
+    position: 'relative',
+  },
+  alarmControls: {
+    padding: 20,
     justifyContent: 'flex-start',
-    // alignItems: 'flex-start',
+  },
+  alarmModal: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
   },
   text: {
     fontSize: 18,
@@ -55,5 +63,4 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
   },
-  modal: {},
 });
