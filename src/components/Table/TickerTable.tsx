@@ -19,7 +19,7 @@ import { loadBookmarks, saveBookmarks } from '../../utils/bookmarkStorage';
 import { ChartLegend } from '../Legend/ChartLegend';
 import { useSelectedCoin } from '../../store/useSelectedCoin';
 import { SearchBar } from '../SearchBar/SearchBar';
-import { ITableDataRow } from '../../types/CoinTable';
+import { ITableDataRow } from '../../types/coin-table';
 import CellRenderer from './CellRenderer';
 
 interface ITickerTable {
@@ -82,10 +82,10 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     const sortKeyChanged = prevSortKeyRef.current !== sortKey;
     const sortOrderChanged = prevSortOrderRef.current !== sortOrder;
 
-    console.log('queryChanged', queryChanged);
-    console.log('bookMarksChanged', bookMarksChanged);
-    console.log('sortKeyChanged', sortKeyChanged);
-    console.log('sortOrderChanged', sortOrderChanged);
+    // console.log('queryChanged', queryChanged);
+    // console.log('bookMarksChanged', bookMarksChanged);
+    // console.log('sortKeyChanged', sortKeyChanged);
+    // console.log('sortOrderChanged', sortOrderChanged);
 
     if (queryChanged || bookMarksChanged || sortKeyChanged || sortOrderChanged) {
       const lowerCaseQuery = query.toLowerCase()
@@ -110,7 +110,7 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
           filteredData.push(info)
         }
       }
-      console.log('bookMarkTableData', bookMarkTableData);
+      // console.log('bookMarkTableData', bookMarkTableData);
 
       filteredData.sort((a, b) => {
         let aValue: number | string = '';
@@ -137,7 +137,7 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
       setTableData(
         bookMarkTableData.concat(filteredData.map(item => getTableDataRow(item)))
       )
-      console.log("IN !!!!!!!!!! ")
+      // console.log("IN !!!!!!!!!! ")
     } else {
       setTableData(prevTableData => {
         const newTableData: ITableDataRow[] = [];
@@ -158,7 +158,7 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
         return newTableData;
       });
 
-      console.log("OUT !!!!!!!!!! ")
+      // console.log("OUT !!!!!!!!!! ")
     }
 
     prevQueryRef.current = query;
@@ -166,12 +166,12 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     prevSortKeyRef.current = sortKey;
     prevSortOrderRef.current = sortOrder;
 
-    console.log("coinList", coinList)
-    console.log('sortKey', sortKey);
-    console.log('sortOrder', sortOrder);
-    console.log('bookMarks', bookMarks);
-    console.log('query', query);
-    console.log('',);
+    // console.log("coinList", coinList)
+    // console.log('sortKey', sortKey);
+    // console.log('sortOrder', sortOrder);
+    // console.log('bookMarks', bookMarks);
+    // console.log('query', query);
+    // console.log('',);
 
   }, [coinList, query, bookMarks, sortKey, sortOrder])
 
@@ -282,8 +282,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     setQuery(text);
   };
 
-  // console.log(filteredData);
-  // console.log(data, tableData);
   const flexArr = [2, 2, 2, 1];
 
   const renderHeader = () => {
