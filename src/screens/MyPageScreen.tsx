@@ -1,8 +1,12 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Notification} from '../components/Notification/Notifications';
+import { View, StyleSheet } from 'react-native';
+import { Notification } from '../components/Notification/Notifications';
+import { Auth } from '../components/Auth/Auth';
 
 export const MyPageScreen = () => {
+
+  return <Auth />
+
   return (
     <View style={styles.container}>
       <Notification />

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { ITableDataRow } from '../../types/CoinTable';
+import { ITableDataRow } from '../../types/coin-table';
 
 const CELL_DATA_TYPES = ["symbol", "kimpPrice", "volumeRatio",] as const;
 type TCellDataType = typeof CELL_DATA_TYPES[number];
