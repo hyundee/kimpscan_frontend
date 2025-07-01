@@ -22,7 +22,9 @@ export const Notification = () => {
         </TouchableOpacity>
       </View>
       <TouchableWithoutFeedback onPress={() => active && setActive(false)}>
-        <View style={styles.alarmModal}>{active && <NotificationModal />}</View>
+        <View style={styles.alarmModal}>
+          {active && <NotificationModal setActive={setActive} />}
+        </View>
       </TouchableWithoutFeedback>
     </View>
   );
