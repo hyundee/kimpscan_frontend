@@ -1,9 +1,24 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
-export const NotificationModal = () => {
+interface INotificationModal {
+  setActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const NotificationModal = ({setActive}: INotificationModal) => {
   const [selectedValue, setSelectedValue] = useState('BTC');
+
+  const handleSubmit = () => {
+    console.log('알람 저장');
+    setActive(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -21,6 +36,17 @@ export const NotificationModal = () => {
       <TextInput style={styles.input}>5.8%</TextInput>
       <Text style={styles.text}>동일 알람 방지 기간</Text>
       <TextInput style={styles.input}>3600분</TextInput>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.confirmButton]}
+          onPress={handleSubmit}>
+          <Text style={styles.confirmText}>확인</Text>
+        </TouchableOpacity>
+        <View style={{width: 10}} />
+        <TouchableOpacity style={styles.button}>
+          <Text>취소</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -46,5 +72,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: 50,
     paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 35,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+  },
+  confirmButton: {
+    backgroundColor: '#000',
+  },
+  confirmText: {
+    color: '#fff',
   },
 });
