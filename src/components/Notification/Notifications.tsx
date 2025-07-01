@@ -22,12 +22,12 @@ export const Notification = () => {
           <Text style={styles.buttonText}>알람 추가 +</Text>
         </TouchableOpacity>
       </View>
+      <NotificationList />
       <TouchableWithoutFeedback onPress={() => active && setActive(false)}>
         <View style={styles.alarmModal}>
           {active && <NotificationModal setActive={setActive} />}
         </View>
       </TouchableWithoutFeedback>
-      <NotificationList />
     </View>
   );
 };

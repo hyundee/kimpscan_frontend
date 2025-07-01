@@ -20,6 +20,11 @@ export const NotificationModal = ({setActive}: INotificationModal) => {
     setActive(false);
   };
 
+  const handleCancel = () => {
+    console.log('알람 저장');
+    setActive(false);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>종목</Text>
@@ -43,7 +48,7 @@ export const NotificationModal = ({setActive}: INotificationModal) => {
           <Text style={styles.confirmText}>확인</Text>
         </TouchableOpacity>
         <View style={{width: 10}} />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleCancel}>
           <Text>취소</Text>
         </TouchableOpacity>
       </View>
@@ -60,6 +65,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e2e2',
     color: '#000',
+    zIndex: 99,
   },
   text: {
     fontSize: 16,
