@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {NotificationModal} from './NotificationModal';
+import {NotificationList} from './NotificationList';
 
 export const Notification = () => {
   const [active, setActive] = useState(false);
@@ -26,6 +27,7 @@ export const Notification = () => {
           {active && <NotificationModal setActive={setActive} />}
         </View>
       </TouchableWithoutFeedback>
+      <NotificationList />
     </View>
   );
 };
