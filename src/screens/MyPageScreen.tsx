@@ -2,14 +2,14 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Notification } from '../components/Notification/Notifications';
 import { Auth } from '../components/Auth/Auth';
+import { useLogin } from '@/store/useLogin';
 
 export const MyPageScreen = () => {
-
-  return <Auth />
+  const isLoggedIn = useLogin(state => state.isLoggedIn)
 
   return (
     <View style={styles.container}>
-      <Notification />
+      {isLoggedIn ? <Notification /> : <Auth />}
     </View>
   );
 };

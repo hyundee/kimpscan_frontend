@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button, Text, View } from "react-native";
-import * as Keychain from 'react-native-keychain';
 import {
   GoogleSignin,
   GoogleSigninButton,
-  SignInResponse,
   statusCodes,
-  User,
 } from '@react-native-google-signin/google-signin';
 import { Alert } from "react-native";
 import { StyleSheet } from "react-native";
 import axios from "axios";
-import { STORAGE_KEYS } from "../../constants/storage-keys";
+import { URLS } from "@/constants/urls";
+import { useLogin } from "@/store/useLogin";
 
 export const GoogleAuth = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const setHasJwt = useLogin(state => state.setHasJwt)
+  const saveJwt = useLogin(state => state.saveJwt)
+  const signOut = useLogin(state => state.signOut)
   const WEB_CLIENT_ID = "785700886834-l59i9ia3rk3kt9a4svmh156tbht9187u.apps.googleusercontent.com"
 
   useEffect(() => {
@@ -39,16 +39,12 @@ export const GoogleAuth = () => {
         throw new Error('Google로부터 인증 코드를 받지 못했습니다. 다시 시도해주세요.');
       }
 
-      // const url = `http://192.168.45.88:8080/login/oauth2/code/google/web?code=${authCode}`
-      const url = `https://api.kimpscan.com/login/oauth2/code/google/web?code=${authCode}`
+      const url = `${URLS.API_URL}/login/oauth2/code/google/web?code=${authCode}`
       const resp = await axios.post<AuthResp>(url)
-      await Keychain.setGenericPassword(STORAGE_KEYS.ACCESS_TOKEN, resp.data.accessToken);
-      await Keychain.setGenericPassword(STORAGE_KEYS.REFRESH_TOKEN, resp.data.refreshToken);
-      await Keychain.setGenericPassword(STORAGE_KEYS.ACCESS_TOKEN_EXPIRY, resp.data.accessTokenExpiry);
-      await Keychain.setGenericPassword(STORAGE_KEYS.REFRESH_TOKEN_EXPIRY, resp.data.refreshTokenExpiry);
 
-      setLoggedIn(true);
-      Alert.alert('로그인 성공', `환영합니다, ${user.data?.user.name}!`);
+      saveJwt(resp.data)
+      setHasJwt(true);
+      // Alert.alert('로그인 성공', `환영합니다, ${user.data?.user.name}!`);
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         Alert.alert('로그인 취소', '사용자가 로그인을 취소했습니다.');
@@ -63,11 +59,9 @@ export const GoogleAuth = () => {
     }
   };
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
-      await GoogleSignin.revokeAccess(); // 이전 액세스 권한 취소
-      await GoogleSignin.signOut(); // 로그아웃
-      setLoggedIn(false);
+      await signOut()
       Alert.alert('로그아웃', '성공적으로 로그아웃되었습니다.');
     } catch (error: any) {
       Alert.alert('로그아웃 오류', `로그아웃 중 오류 발생: ${error.message}`);
@@ -86,7 +80,7 @@ export const GoogleAuth = () => {
     <View>
       <Text style={styles.loggedInText}>환영합니다 님!</Text>
       <Text style={styles.emailText}></Text>
-      <Button title="로그아웃" onPress={signOut} />
+      <Button title="로그아웃" onPress={handleSignOut} />
     </View>
   </View>
 }
