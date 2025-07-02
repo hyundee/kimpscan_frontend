@@ -14,7 +14,6 @@ import { useLogin } from "@/store/useLogin";
 export const GoogleAuth = () => {
   const setHasJwt = useLogin(state => state.setHasJwt)
   const saveJwt = useLogin(state => state.saveJwt)
-  const signOut = useLogin(state => state.signOut)
   const WEB_CLIENT_ID = "785700886834-l59i9ia3rk3kt9a4svmh156tbht9187u.apps.googleusercontent.com"
 
   useEffect(() => {
@@ -59,39 +58,22 @@ export const GoogleAuth = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      Alert.alert('로그아웃', '성공적으로 로그아웃되었습니다.');
-    } catch (error: any) {
-      Alert.alert('로그아웃 오류', `로그아웃 중 오류 발생: ${error.message}`);
-      console.error(error);
-    }
-  };
-
   return <View style={styles.container}>
-    <Text style={styles.title}>Google Sign-In Example</Text>
+    <Text style={styles.title}>로그인</Text>
     <GoogleSigninButton
       style={styles.button}
       size={GoogleSigninButton.Size.Wide}
       color={GoogleSigninButton.Color.Dark}
       onPress={signIn}
     />
-    <View>
-      <Text style={styles.loggedInText}>환영합니다 님!</Text>
-      <Text style={styles.emailText}></Text>
-      <Button title="로그아웃" onPress={handleSignOut} />
-    </View>
   </View>
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    minHeight: "100%",
     // backgroundColor: '#f8f8f8',
   },
   title: {

@@ -5,8 +5,8 @@ import { useLogin } from "@/store/useLogin";
 import axios from "axios";
 import * as Keychain from 'react-native-keychain';
 
-
-const setIsLoggedIn = useLogin(state => state.setIsLoggedIn)
+// 훅 대신 상태 스토어 직접 접근
+const loginStore = useLogin.getState();
 
 const authAxios = axios.create({
   baseURL: URLS.API_URL,
@@ -80,14 +80,14 @@ authAxios.interceptors.response.use(
       } catch (refreshError) {
 
         // 로그인 페이지로 이동
-        setIsLoggedIn(false);
+        loginStore.signOut();
         navigate({ name: "MyPage", params: undefined });
         return Promise.reject(refreshError);
       }
     }
 
     // 로그인 페이지로 이동
-    setIsLoggedIn(false);
+    loginStore.signOut();
     navigate({ name: "MyPage", params: undefined });
     return Promise.reject(error);
   }
