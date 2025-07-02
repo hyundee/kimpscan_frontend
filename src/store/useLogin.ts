@@ -38,6 +38,8 @@ export const useLogin = create<Login>()((set, get) => ({
     await Keychain.resetInternetCredentials({ server: STORAGE_KEYS.REFRESH_TOKEN })
     await Keychain.resetInternetCredentials({ server: STORAGE_KEYS.ACCESS_TOKEN_EXPIRY })
     await Keychain.resetInternetCredentials({ server: STORAGE_KEYS.REFRESH_TOKEN_EXPIRY })
+
+    await get().setHasJwt(false);
   },
   signOut: async () => {
     // 구글 로그아웃
@@ -46,6 +48,9 @@ export const useLogin = create<Login>()((set, get) => ({
 
     // jwt 삭제
     await get().clearJwt();
+
+    // isLoggedIn 를 false로 변경
+    await get().setIsLoggedIn(false);
   }
 }));
 
