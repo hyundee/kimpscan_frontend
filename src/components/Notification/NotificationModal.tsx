@@ -14,6 +14,8 @@ interface INotificationModal {
 
 export const NotificationModal = ({ setActive }: INotificationModal) => {
   const [selectedValue, setSelectedValue] = useState<CoinName>();
+  const [kimp, setKimp] = useState<string>("");
+  const [preventTimeSec, setPreventTimeSec] = useState<string>("");
 
   const handleSubmit = () => {
     console.log('알람 저장');
@@ -25,14 +27,45 @@ export const NotificationModal = ({ setActive }: INotificationModal) => {
     setActive(false);
   };
 
+  const strictNumericRegex = /^(0|[1-9]\d*)?(\.\d*)?$/;
+
+  // onChangeText 핸들러를 위한 헬퍼 함수
+  const handleNumericInputChange = (text: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    // 1. 빈 문자열은 항상 허용 (입력 필드를 비울 수 있도록)
+    if (text === '') {
+      setter('');
+      return;
+    }
+
+    // 2. 현재 입력된 텍스트가 엄격한 숫자 형식에 맞는지 검사
+    if (strictNumericRegex.test(text)) {
+      setter(text);
+    }
+    // 3. 사용자가 .만 입력한 경우 (예: "."), 다음 숫자를 입력할 수 있도록 허용
+    else if (text === '.') {
+      setter(text);
+    }
+    // 4. 숫자가 아닌 문자를 입력하면 무시 (setter를 호출하지 않음)
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>종목</Text>
       <NotificationAutocomplete onSelect={(item) => { setSelectedValue(item) }} />
       <Text style={styles.text}>김치프리미엄(%)</Text>
-      <TextInput style={styles.input}>5.8</TextInput>
+      <TextInput
+        style={styles.input}
+        value={kimp?.toString() ?? ""}
+        onChangeText={(text) => handleNumericInputChange(text, setKimp)}
+        keyboardType="numeric"
+      />
       <Text style={styles.text}>동일 알람 방지 기간(초)</Text>
-      <TextInput style={styles.input}>3600</TextInput>
+      <TextInput
+        style={styles.input}
+        value={preventTimeSec?.toString() ?? ""}
+        onChangeText={(text) => handleNumericInputChange(text, setPreventTimeSec)}
+        keyboardType="numeric"
+      />
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.confirmButton]}
