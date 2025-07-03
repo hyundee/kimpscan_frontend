@@ -7,12 +7,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NotificationAutocomplete } from './NotificationAutocomplete';
+import { CoinName } from '@/types/coins';
 interface INotificationModal {
   setActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const NotificationModal = ({ setActive }: INotificationModal) => {
-  const [selectedValue, setSelectedValue] = useState('BTC');
+  const [selectedValue, setSelectedValue] = useState<CoinName>();
 
   const handleSubmit = () => {
     console.log('알람 저장');
@@ -27,7 +28,7 @@ export const NotificationModal = ({ setActive }: INotificationModal) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>종목</Text>
-      <NotificationAutocomplete />
+      <NotificationAutocomplete onSelect={(item) => { setSelectedValue(item) }} />
       <Text style={styles.text}>김치프리미엄(%)</Text>
       <TextInput style={styles.input}>5.8</TextInput>
       <Text style={styles.text}>동일 알람 방지 기간(초)</Text>

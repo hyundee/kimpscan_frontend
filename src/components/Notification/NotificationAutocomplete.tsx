@@ -1,31 +1,49 @@
-import { useAutocomplete } from "@/store/useAutocomplete";
+import { URLS } from "@/constants/urls";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
+import useDebounce from "@/hooks/useDebounce";
+import authAxios from "@/lib/authAxios";
 import { CoinName } from "@/types/coins";
 import { FlashList } from "@shopify/flash-list";
-import { useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View, TextInput, Text } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, TouchableOpacity, View, TextInput, Text, Alert } from "react-native";
 
-const coinData = [
-  { symbol: "BTCUSDT", rootSymbol: "BTC", korName: "비트코인" },
-  { symbol: "BTCUSDT1", rootSymbol: "BTC", korName: "비트코인1" },
-  { symbol: "BTCUSDT2", rootSymbol: "BTC", korName: "비트코인2" },
-  { symbol: "BTCUSDT3", rootSymbol: "BTC", korName: "비트코인3" },
-  { symbol: "ETHUSDT", rootSymbol: "ETH", korName: "이더리움" },
-];
+interface INotificationAutocompleteProps {
+  onSelect: (item: CoinName) => void;
+}
 
-export const NotificationAutocomplete = () => {
+export const NotificationAutocomplete = ({ onSelect }: INotificationAutocompleteProps) => {
+  const [apiCoinData, setApiCoinData] = useState<CoinName[]>([]);
   const { query, setQuery, filteredSuggestions, clear } = useAutocomplete<CoinName>({
-    data: coinData,
-    extractText: item => item.korName
+    data: apiCoinData,
+    extractText: item => item.korName,
+    maxLength: 5,
   });
+  const debouncedQuery = useDebounce(query, 500);
 
   useEffect(() => {
-    console.log('filteredSuggestions', filteredSuggestions);
-  }, [filteredSuggestions])
+    if (!debouncedQuery) {
+      setApiCoinData([]);
+      return;
+    }
+
+    const fetchCoinData = async () => {
+      try {
+        const url = `${URLS.API_URL}/exchange/symbols/search?keyword=${encodeURIComponent(debouncedQuery)}&isStatusTrading=true`
+        const response = await authAxios.get(url);
+        setApiCoinData(response.data);
+      } catch (e) {
+        console.error("Failed to fetch coin data:", e);
+        Alert.alert("오류", "코인 데이터를 불러오는데 실패했습니다. 네트워크 연결을 확인해주세요.");
+      }
+    };
+
+    fetchCoinData();
+  }, [debouncedQuery])
 
   return <View style={styles.suggestionContainer}>
     <TextInput
       style={styles.input}
-      placeholder="Search framework..."
+      placeholder="ex) 비트코인, BTC, btc"
       value={query}
       onChangeText={setQuery}
     />
@@ -38,8 +56,8 @@ export const NotificationAutocomplete = () => {
             <TouchableOpacity
               style={styles.suggestionItem}
               onPress={() => {
+                onSelect(item);
                 setQuery(`${item.korName}(${item.rootSymbol})`);
-                clear();
               }}
             >
               <Text>{`${item.korName}(${item.rootSymbol})`}</Text>
