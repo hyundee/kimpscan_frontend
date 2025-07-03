@@ -14,3 +14,9 @@ export type CoinInfo = {
   usdt24hVolume?: string;
   kimp?: string;
 };
+
+export type CoinName = {
+  symbol: string;
+  rootSymbol: string;
+  korName: string;
+}
