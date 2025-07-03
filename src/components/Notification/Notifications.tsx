@@ -1,13 +1,14 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Modal,
 } from 'react-native';
-import {NotificationModal} from './NotificationModal';
-import {NotificationList} from './NotificationList';
+import { NotificationModal } from './NotificationModal';
+import { NotificationList } from './NotificationList';
 
 export const Notification = () => {
   const [active, setActive] = useState(false);
@@ -23,11 +24,22 @@ export const Notification = () => {
         </TouchableOpacity>
       </View>
       <NotificationList />
-      <TouchableWithoutFeedback onPress={() => active && setActive(false)}>
-        <View style={styles.alarmModal}>
-          {active && <NotificationModal setActive={setActive} />}
-        </View>
-      </TouchableWithoutFeedback>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={active}
+        onRequestClose={() => {
+          setActive(false);
+        }}
+      >
+        <TouchableWithoutFeedback onPress={() => setActive(false)}>
+          <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <NotificationModal setActive={setActive} />
+              </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -66,5 +78,15 @@ const styles = StyleSheet.create({
     color: '#000',
     padding: 10,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(93, 85, 85, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#e2e2e2',
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
   },
 });
