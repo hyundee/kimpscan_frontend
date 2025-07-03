@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
-
+import { NotificationAutocomplete } from './NotificationAutocomplete';
 interface INotificationModal {
   setActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const NotificationModal = ({setActive}: INotificationModal) => {
+export const NotificationModal = ({ setActive }: INotificationModal) => {
   const [selectedValue, setSelectedValue] = useState('BTC');
 
   const handleSubmit = () => {
@@ -28,26 +27,18 @@ export const NotificationModal = ({setActive}: INotificationModal) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>종목</Text>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={itemValue => setSelectedValue(itemValue)}
-        style={styles.input}>
-        <Picker.Item label="BTC" value="BTC" />
-        <Picker.Item label="ETH" value="ETH" />
-        <Picker.Item label="SOL" value="SOL" />
-        <Picker.Item label="AXL" value="AXL" />
-      </Picker>
-      <Text style={styles.text}>김치프리미엄</Text>
-      <TextInput style={styles.input}>5.8%</TextInput>
-      <Text style={styles.text}>동일 알람 방지 기간</Text>
-      <TextInput style={styles.input}>3600분</TextInput>
+      <NotificationAutocomplete />
+      <Text style={styles.text}>김치프리미엄(%)</Text>
+      <TextInput style={styles.input}>5.8</TextInput>
+      <Text style={styles.text}>동일 알람 방지 기간(초)</Text>
+      <TextInput style={styles.input}>3600</TextInput>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.confirmButton]}
           onPress={handleSubmit}>
           <Text style={styles.confirmText}>확인</Text>
         </TouchableOpacity>
-        <View style={{width: 10}} />
+        <View style={{ width: 10 }} />
         <TouchableOpacity style={styles.button} onPress={handleCancel}>
           <Text>취소</Text>
         </TouchableOpacity>
@@ -65,7 +56,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e2e2',
     color: '#000',
-    zIndex: 99,
+    zIndex: 1, // container의 zIndex를 너무 높게 설정하면 다른 요소 위에 떠야 하는 FlashList가 가려질 수 있음.
+    // FlashList가 더 높은 zIndex를 가져야 합니다.
   },
   text: {
     fontSize: 16,
