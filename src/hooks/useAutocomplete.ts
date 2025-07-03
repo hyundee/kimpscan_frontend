@@ -3,11 +3,13 @@ import { useEffect, useMemo, useState } from 'react';
 type UseAutocompleteOptions<T> = {
   data: T[];
   extractText?: (item: T) => string;
+  maxLength: number;
 };
 
 export function useAutocomplete<T>({
   data,
   extractText = (item) => String(item),
+  maxLength = 5,
 }: UseAutocompleteOptions<T>) {
   const [query, setQuery] = useState('');
   const [filteredSuggestions, setFilteredSuggestions] = useState<T[]>([]);
@@ -20,9 +22,13 @@ export function useAutocomplete<T>({
     }
 
     const lowerQuery = query.toLowerCase();
-    const results = data.filter((item) =>
+    let results = data.filter((item) =>
       extractText(item).toLowerCase().includes(lowerQuery)
     );
+
+    if (results.length > maxLength) {
+      results = results.slice(0, maxLength);
+    }
 
     setFilteredSuggestions(results);
   }, [query, data]);
