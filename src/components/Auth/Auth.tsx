@@ -5,6 +5,7 @@ import { useFcm } from "@/store/useFcm";
 import { useEffect } from "react";
 import { useLogin } from "@/store/useLogin";
 import authAxios from "@/lib/authAxios";
+import axios from "axios";
 
 export const Auth = () => {
   const fcmKey = useFcm(state => state.fcmKey);
@@ -14,8 +15,8 @@ export const Auth = () => {
 
   const requestToAddFcmKey = async () => {
     try {
-      const url = `${URLS.API_URL}/user/fcm`;
-      const data = { key: fcmKey };
+      const url = `${URLS.MESSAGE_URL}/message/fcm`;
+      const data = { token: fcmKey };
       await authAxios.post(url, data);
       console.log('FCM 키 등록 성공');
     } catch (error) {
