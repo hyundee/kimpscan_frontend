@@ -70,7 +70,10 @@ export const Notification = () => {
 
           {/* 안쪽 누르면 안 닫힘 */}
           <View style={styles.modalContent}>
-            <NotificationModal setActive={setActive} />
+            <NotificationModal
+              onSuccess={() => { updateAlarmList() }}
+              setActive={setActive}
+            />
           </View>
         </View>
       </Modal>

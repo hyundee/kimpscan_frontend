@@ -1,5 +1,5 @@
 import { AlarmData } from '@/types/notification';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { TableWrapper } from 'react-native-table-component';
 import { Row } from 'react-native-table-component';
