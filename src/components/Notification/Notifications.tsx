@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,41 @@ import {
 } from 'react-native';
 import { NotificationModal } from './NotificationModal';
 import { NotificationList } from './NotificationList';
+import { URLS } from '@/constants/urls';
+import authAxios from '@/lib/authAxios';
+import { AlarmData } from '@/types/notification';
+import axios from 'axios';
 
 export const Notification = () => {
   const [active, setActive] = useState(false);
+  const [alarmDataList, setAlarmDataList] = useState<AlarmData[]>([]);
+
+  const requestAlarmList = async (): Promise<AlarmData[]> => {
+    try {
+      const url = `${URLS.MESSAGE_URL}/message/settings`;
+      const result = await authAxios.get(url);
+      return result.data.data
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('목록 조회 실패 - 응답 코드:', error.response?.status);
+        console.error('목록 조회 실패 - 응답 데이터:', error.response?.data);
+        console.error('목록 조회 실패 - 응답 헤더:', error.response?.headers);
+      }
+      console.error('목록 조회 실패', error)
+      throw error;
+    }
+  }
+
+  const updateAlarmList = async () => {
+    const data = await requestAlarmList()
+    if (data) {
+      setAlarmDataList(data);
+    }
+  }
+
+  useEffect(() => {
+    updateAlarmList()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -23,7 +55,7 @@ export const Notification = () => {
           <Text style={styles.buttonText}>알람 추가 +</Text>
         </TouchableOpacity>
       </View>
-      <NotificationList />
+      <NotificationList data={alarmDataList} />
       <Modal
         animationType="slide"
         transparent={true}

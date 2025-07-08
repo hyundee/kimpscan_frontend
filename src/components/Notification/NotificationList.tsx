@@ -1,40 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-// import {Cell} from 'react-native-table-component';
-import {TableWrapper} from 'react-native-table-component';
-import {Row} from 'react-native-table-component';
-import {Table} from 'react-native-table-component';
+import { AlarmData } from '@/types/notification';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { TableWrapper } from 'react-native-table-component';
+import { Row } from 'react-native-table-component';
+import { Table } from 'react-native-table-component';
 
-type AlarmData = {
-  rootSymbol: string;
-  kimp: string;
-  date: string;
-};
+interface INotificationListProps {
+  data: AlarmData[]
+}
 
-export const NotificationList = () => {
-  const [alarmData, setAlarmData] = useState<AlarmData[]>([]);
-
+export const NotificationList = ({ data }: INotificationListProps) => {
   const headerTitles = ['종목', '김프', '동일알람\n방지기간'];
 
-  useEffect(() => {
-    setAlarmData([
-      {
-        rootSymbol: 'BTC',
-        kimp: '3.25%',
-        date: '3600분',
-      },
-      {
-        rootSymbol: 'ETH',
-        kimp: '1.02',
-        date: '1000분',
-      },
-      {
-        rootSymbol: 'SOL',
-        kimp: '0.78',
-        date: '2200분',
-      },
-    ]);
-  }, []);
+  const getRow = (rawRow: AlarmData) => {
+    const rootSymbol = rawRow.symbol.slice(0, -4);
+    const kimp = `${rawRow.kimpPercent}%`
+    const slientTime = `${rawRow.silentTime}초`
+
+    return [rootSymbol, kimp, slientTime]
+
+  }
 
   return (
     <View style={styles.container}>
@@ -51,11 +36,11 @@ export const NotificationList = () => {
             })}
           />
           <TableWrapper>
-            {alarmData.map((rowData, rowIndex) => (
+            {data.map((rowData, rowIndex) => (
               <Row
                 textStyle={styles.rowText}
                 key={rowIndex}
-                data={[rowData.rootSymbol, rowData.kimp, rowData.date]}
+                data={getRow(rowData)}
               />
             ))}
           </TableWrapper>
