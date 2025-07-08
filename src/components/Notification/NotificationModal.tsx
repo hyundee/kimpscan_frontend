@@ -15,6 +15,7 @@ import { URLS } from '@/constants/urls';
 import axios from 'axios';
 
 interface INotificationModal {
+  onSuccess: () => void,
   setActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -25,7 +26,7 @@ interface IMessageSetting {
   silentTime: number;
 }
 
-export const NotificationModal = ({ setActive }: INotificationModal) => {
+export const NotificationModal = ({ onSuccess, setActive }: INotificationModal) => {
   const [selectedValue, setSelectedValue] = useState<CoinName>();
   const [kimp, setKimp] = useState<string>("");
   const [silentTimeSec, setSilentTime] = useState<string>("");
@@ -87,6 +88,7 @@ export const NotificationModal = ({ setActive }: INotificationModal) => {
     })
 
     if (isOkRequest) {
+      onSuccess();
       setActive(false);
     }
   };
