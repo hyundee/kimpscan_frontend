@@ -28,17 +28,19 @@ export const Notification = () => {
         animationType="slide"
         transparent={true}
         visible={active}
-        onRequestClose={() => {
-          setActive(false);
-        }}
+        onRequestClose={() => setActive(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setActive(false)}>
-          <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <NotificationModal setActive={setActive} />
-              </View>
+        <View style={styles.modalOverlay}>
+          {/* 바깥 누르면 닫힘 */}
+          <TouchableWithoutFeedback onPress={() => setActive(false)}>
+            <View style={styles.overlayTouchableArea} />
+          </TouchableWithoutFeedback>
+
+          {/* 안쪽 누르면 안 닫힘 */}
+          <View style={styles.modalContent}>
+            <NotificationModal setActive={setActive} />
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </Modal>
     </View>
   );
@@ -83,6 +85,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(93, 85, 85, 0.5)',
+  },
+  overlayTouchableArea: {
+    flex: 1, // 화면 바깥 전체 차지
   },
   modalContent: {
     backgroundColor: '#e2e2e2',
