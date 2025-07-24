@@ -1,23 +1,50 @@
 import { AlarmData } from '@/types/notification';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { TableWrapper } from 'react-native-table-component';
 import { Row } from 'react-native-table-component';
 import { Table } from 'react-native-table-component';
 
 interface INotificationListProps {
-  data: AlarmData[]
+  data: AlarmData[];
+  onDeleteAlarm: (settingId: number) => void;
 }
 
-export const NotificationList = ({ data }: INotificationListProps) => {
-  const headerTitles = ['종목', '김프', '동일알람\n방지기간'];
+export const NotificationList = ({ data, onDeleteAlarm }: INotificationListProps) => {
+  const headerTitles = ['종목', '김프', '동일알람\n방지기간', '삭제'];
 
   const getRow = (rawRow: AlarmData) => {
     const rootSymbol = rawRow.symbol.slice(0, -4);
     const kimp = `${rawRow.kimpPercent}%`
     const slientTime = `${rawRow.silentTime}초`
+    const deleteButton = (
+      <TouchableOpacity
+        onPress={() => {
+          // 삭제 확인 대화상자 표시
+          Alert.alert(
+            "알람 삭제",
+            `${rootSymbol} 알람을 정말 삭제하시겠습니까?`,
+            [
+              {
+                text: "취소",
+                style: "cancel"
+              },
+              {
+                text: "삭제",
+                onPress: () => { onDeleteAlarm(rawRow.id) }, // 부모로부터 받은 삭제 함수 호출
+                style: "destructive" // iOS에서 "삭제" 버튼을 빨간색으로 표시
+              }
+            ],
+            { cancelable: true }
+          );
+        }}
+        style={styles.deleteButton}
+      >
+        <Text>❌</Text>
+      </TouchableOpacity>
+    );
 
-    return [rootSymbol, kimp, slientTime]
+    return [rootSymbol, kimp, slientTime, deleteButton]
 
   }
 
@@ -74,4 +101,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 6,
   },
+  deleteButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

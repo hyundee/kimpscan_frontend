@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Modal,
+  Alert,
 } from 'react-native';
 import { NotificationModal } from './NotificationModal';
 import { NotificationList } from './NotificationList';
@@ -34,6 +35,22 @@ export const Notification = () => {
     }
   }
 
+  const requestDeleteNotification = async (settingId: number) => {
+    try {
+      const url = `${URLS.MESSAGE_URL}/message/settings/${settingId}`
+      const response = await authAxios.delete(url);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('목록 조회 실패 - 응답 코드:', error.response?.status);
+        console.error('목록 조회 실패 - 응답 데이터:', error.response?.data);
+        console.error('목록 조회 실패 - 응답 헤더:', error.response?.headers);
+      }
+      console.error('목록 조회 실패', error)
+      Alert.alert("알람 삭제 실패", "알람 데이터를 삭제하지 못하였습니다.");
+      throw error;
+    }
+  };
+
   const updateAlarmList = async () => {
     const data = await requestAlarmList()
     if (data) {
@@ -55,7 +72,10 @@ export const Notification = () => {
           <Text style={styles.buttonText}>알람 추가 +</Text>
         </TouchableOpacity>
       </View>
-      <NotificationList data={alarmDataList} />
+      <NotificationList data={alarmDataList} onDeleteAlarm={async (settingId: number) => {
+        await requestDeleteNotification(settingId)
+        updateAlarmList()
+      }} />
       <Modal
         animationType="slide"
         transparent={true}
