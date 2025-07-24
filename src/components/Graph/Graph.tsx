@@ -4,6 +4,7 @@ import {ScrollView, StyleSheet, View, Dimensions} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
 import {useSelectedCoin} from '../../store/useSelectedCoin';
 import {GraphLegend} from '../Legend/GraphLegend';
+import { URLS } from '@/constants/urls';
 
 export const Graph = React.memo(() => {
   const coin = useSelectedCoin(state => state.coin);
@@ -25,7 +26,7 @@ export const Graph = React.memo(() => {
     if (!initialData) {
       axios
         .get(
-          `https://api.kimpscan.com/exchange/moving-avgs/init?symbol=${coin}`,
+          `${URLS.API_URL}/exchange/moving-avgs/init?symbol=${coin}`,
         )
         .then(res => {
           const raw = res.data;
@@ -41,7 +42,7 @@ export const Graph = React.memo(() => {
 
   useEffect(() => {
     ws.current = new WebSocket(
-      'wss://api.kimpscan.com/ws/exchange/moving-avgs',
+      `wss://${URLS.API_URL}/ws/exchange/moving-avgs`,
       undefined,
       {
         headers: {

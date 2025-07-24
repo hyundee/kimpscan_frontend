@@ -4,6 +4,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { TickerTable } from '../components/Table/TickerTable';
 import { Graph } from '../components/Graph/Graph';
 import { Coins } from '../types/coins';
+import { URLS } from '@/constants/urls';
 
 export const HomeScreen = () => {
   const ws = useRef<WebSocket | null>(null);
@@ -17,7 +18,7 @@ export const HomeScreen = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        'https://api.kimpscan.com/exchange/tickers/init',
+        `${URLS.API_URL}/exchange/tickers/init`,
       );
       console.log('Data:', response.data);
       setCoins(response.data);
@@ -39,7 +40,7 @@ export const HomeScreen = () => {
     }
 
     ws.current = new WebSocket(
-      'wss://api.kimpscan.com/ws/exchange/tickers',
+      `wss://${URLS.API_URL}/ws/exchange/tickers`,
       undefined,
       {
         headers: {
