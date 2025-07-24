@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import {ScrollView, StyleSheet, View, Dimensions} from 'react-native';
-import {LineChart} from 'react-native-chart-kit';
-import {useSelectedCoin} from '../../store/useSelectedCoin';
-import {GraphLegend} from '../Legend/GraphLegend';
+import { ScrollView, StyleSheet, View, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import { useSelectedCoin } from '../../store/useSelectedCoin';
+import { GraphLegend } from '../Legend/GraphLegend';
 import { URLS } from '@/constants/urls';
 
 export const Graph = React.memo(() => {
@@ -34,15 +34,19 @@ export const Graph = React.memo(() => {
           const ma5 = raw.map((item: number[]) => item[1]);
           const ma20 = raw.map((item: number[]) => item[2]);
 
-          setInitialData({kimp, ma5, ma20});
+          setInitialData({ kimp, ma5, ma20 });
         })
         .catch(err => console.error('Error fetching:', err));
     }
   }, [coin, initialData]);
 
   useEffect(() => {
+    const websocketUrl = URLS.API_URL
+      .replace("http://", "wss://") 
+      .replace("https://", "wss://")
+      
     ws.current = new WebSocket(
-      `wss://${URLS.API_URL}/ws/exchange/moving-avgs`,
+      `${websocketUrl}/ws/exchange/moving-avgs`,
       undefined,
       {
         headers: {

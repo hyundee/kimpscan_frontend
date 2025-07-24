@@ -39,8 +39,12 @@ export const HomeScreen = () => {
       return;
     }
 
+    const websocketUrl = URLS.API_URL
+          .replace("http://", "wss://") 
+          .replace("https://", "wss://")
+
     ws.current = new WebSocket(
-      `wss://${URLS.API_URL}/ws/exchange/tickers`,
+      `${websocketUrl}/ws/exchange/tickers`,
       undefined,
       {
         headers: {
