@@ -80,7 +80,10 @@ export const Notification = () => {
         <Text style={styles.text}>- 알람</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => setActive(prev => !prev)}>
+          onPress={() => {
+            setActive(prev => !prev)
+            setSelectedAlarmData(undefined)
+          }}>
           <Text style={styles.buttonText}>알람 추가 +</Text>
         </TouchableOpacity>
       </View>

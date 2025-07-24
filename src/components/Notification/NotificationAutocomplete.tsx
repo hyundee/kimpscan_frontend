@@ -9,10 +9,11 @@ import { StyleSheet, TouchableOpacity, View, TextInput, Text, Alert } from "reac
 
 interface INotificationAutocompleteProps {
   onSelect: (item: CoinName) => void;
+  onFocus: () => void;
   initQuery: string;
 }
 
-export const NotificationAutocomplete = ({ onSelect, initQuery }: INotificationAutocompleteProps) => {
+export const NotificationAutocomplete = ({ onSelect, onFocus, initQuery }: INotificationAutocompleteProps) => {
   const [apiCoinData, setApiCoinData] = useState<CoinName[]>([]);
   const { query, setQuery, filteredSuggestions, clear } = useAutocomplete<CoinName>({
     data: apiCoinData,
@@ -48,6 +49,10 @@ export const NotificationAutocomplete = ({ onSelect, initQuery }: INotificationA
       placeholder="ex) 비트코인, BTC, btc"
       value={query}
       onChangeText={setQuery}
+      onFocus={() => {
+        onFocus();
+        clear();
+      }}
     />
     {filteredSuggestions.length > 0 && (
       <View style={styles.suggestionList}>

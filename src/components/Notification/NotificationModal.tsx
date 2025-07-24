@@ -181,6 +181,7 @@ export const NotificationModal = ({ onSuccess, setActive, initialData }: INotifi
       <Text style={styles.text}>종목</Text>
       <NotificationAutocomplete
         onSelect={(item) => { setSelectedValue(item) }}
+        onFocus={() => setSelectedValue(undefined)}
         initQuery={initialData ? `${initialData.stockName} (${initialData.symbol.slice(0, -4)})` : ''}
       />
       <Text style={styles.text}>김치프리미엄(%)</Text>
