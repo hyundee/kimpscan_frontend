@@ -5,18 +5,19 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Button,
   Alert,
 } from 'react-native';
 import { NotificationAutocomplete } from './NotificationAutocomplete';
 import { CoinName } from '@/types/coins';
 import authAxios from '@/lib/authAxios';
 import { URLS } from '@/constants/urls';
+import { AlarmData } from '@/types/notification';
 import axios from 'axios';
 
 interface INotificationModal {
   onSuccess: () => void,
   setActive: React.Dispatch<React.SetStateAction<boolean>>;
+  initialData?: AlarmData; // 수정 모드일 때 전달될 초기 데이터, null이면 생성, null이 아니면 수정
 }
 
 interface IMessageSetting {
@@ -26,27 +27,56 @@ interface IMessageSetting {
   silentTime: number;
 }
 
-export const NotificationModal = ({ onSuccess, setActive }: INotificationModal) => {
-  const [selectedValue, setSelectedValue] = useState<CoinName>();
-  const [kimp, setKimp] = useState<string>("");
-  const [silentTimeSec, setSilentTime] = useState<string>("");
+export const NotificationModal = ({ onSuccess, setActive, initialData }: INotificationModal) => {
+  const [selectedValue, setSelectedValue] = useState<CoinName | undefined>(
+    initialData ? {
+      symbol: initialData.symbol,
+      rootSymbol: initialData.symbol.slice(0, -4),
+      korName: initialData.stockName,
+
+    } : undefined
+  );
+  const [kimp, setKimp] = useState<string>(initialData ? initialData.kimpPercent.toString() : "");
+  const [silentTimeSec, setSilentTime] = useState<string>(initialData ? initialData.silentTime.toString() : "");
 
   // 알림 저장 요청
-  const requestToSaveNotification = async (data: IMessageSetting) => {
+  const requestCreateNotification = async (data: IMessageSetting) => {
     try {
       const url = `${URLS.MESSAGE_URL}/message/settings`;
       await authAxios.post(url, data);
       return true;
     } catch (error) {
+      const errorTitlePrefix = "알람 등록 실패"
       if (axios.isAxiosError(error)) {
-        console.error('알람 등록 실패 - 응답 코드:', error.response?.status);
-        console.error('알람 등록 실패 - 응답 데이터:', error.response?.data);
-        console.error('알람 등록 실패 - 응답 헤더:', error.response?.headers);
-        Alert.alert("알람 등록 실패", `${error.response?.data.message}`)
+        console.error(`${errorTitlePrefix} - 응답 코드:`, error.response?.status);
+        console.error(`${errorTitlePrefix} - 응답 데이터:`, error.response?.data);
+        console.error(`${errorTitlePrefix} - 응답 헤더:`, error.response?.headers);
+        Alert.alert(`${errorTitlePrefix}`, `${error.response?.data.message}`)
       } else {
-        Alert.alert("알람 등록 실패", "Fse서버 오류")
+        Alert.alert(`${errorTitlePrefix}`, "서버 오류")
       }
-      console.error('알람 등록 실패', error)
+      console.error(`${errorTitlePrefix}`, error)
+      return false
+    }
+  }
+
+  // 알림 수정 요청
+  const requestUpdateNotification = async (settingId: number, data: IMessageSetting) => {
+    try {
+      const url = `${URLS.MESSAGE_URL}/message/settings/${settingId}`;
+      await authAxios.put(url, data);
+      return true;
+    } catch (error) {
+      const errorTitlePrefix = "알람 수정 실패"
+      if (axios.isAxiosError(error)) {
+        console.error(`${errorTitlePrefix} - 응답 코드:`, error.response?.status);
+        console.error(`${errorTitlePrefix} - 응답 데이터:`, error.response?.data);
+        console.error(`${errorTitlePrefix} - 응답 헤더:`, error.response?.headers);
+        Alert.alert(`${errorTitlePrefix}`, `${error.response?.data.message}`)
+      } else {
+        Alert.alert(`${errorTitlePrefix}`, "서버 오류")
+      }
+      console.error(`${errorTitlePrefix}`, error)
       return false
     }
   }
@@ -80,12 +110,19 @@ export const NotificationModal = ({ onSuccess, setActive }: INotificationModal) 
     const isValid = validateMessageSetting()
     if (!isValid) return;
 
-    const isOkRequest = await requestToSaveNotification({
+    const requestData = {
       symbol: selectedValue?.symbol ?? "",
       stockName: selectedValue?.korName ?? "",
       kimpPercent: parseInt(kimp, 10),
       silentTime: parseFloat(silentTimeSec),
-    })
+    }
+
+    let isOkRequest;
+    if (initialData === undefined || initialData === null) {
+      isOkRequest = await requestCreateNotification(requestData)
+    } else {
+      isOkRequest = await requestUpdateNotification(initialData?.id, requestData)
+    }
 
     if (isOkRequest) {
       onSuccess();
@@ -142,7 +179,10 @@ export const NotificationModal = ({ onSuccess, setActive }: INotificationModal) 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>종목</Text>
-      <NotificationAutocomplete onSelect={(item) => { setSelectedValue(item) }} />
+      <NotificationAutocomplete
+        onSelect={(item) => { setSelectedValue(item) }}
+        initQuery={initialData ? `${initialData.stockName} (${initialData.symbol.slice(0, -4)})` : ''}
+      />
       <Text style={styles.text}>김치프리미엄(%)</Text>
       <TextInput
         style={styles.input}

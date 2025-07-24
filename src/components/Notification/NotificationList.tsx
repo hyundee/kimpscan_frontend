@@ -8,9 +8,10 @@ import { Table } from 'react-native-table-component';
 interface INotificationListProps {
   data: AlarmData[];
   onDeleteAlarm: (settingId: number) => void;
+  onSelectAlarm: (alarmData: AlarmData) => void;
 }
 
-export const NotificationList = ({ data, onDeleteAlarm }: INotificationListProps) => {
+export const NotificationList = ({ data, onDeleteAlarm, onSelectAlarm }: INotificationListProps) => {
   const headerTitles = ['종목', '김프', '동일알람\n방지기간', '삭제'];
 
   const getRow = (rawRow: AlarmData) => {
@@ -19,7 +20,9 @@ export const NotificationList = ({ data, onDeleteAlarm }: INotificationListProps
     const slientTime = `${rawRow.silentTime}초`
     const deleteButton = (
       <TouchableOpacity
-        onPress={() => {
+        onPress={(event) => {
+          event.stopPropagation();
+
           // 삭제 확인 대화상자 표시
           Alert.alert(
             "알람 삭제",
@@ -45,7 +48,6 @@ export const NotificationList = ({ data, onDeleteAlarm }: INotificationListProps
     );
 
     return [rootSymbol, kimp, slientTime, deleteButton]
-
   }
 
   return (
@@ -64,11 +66,16 @@ export const NotificationList = ({ data, onDeleteAlarm }: INotificationListProps
           />
           <TableWrapper>
             {data.map((rowData, rowIndex) => (
-              <Row
-                textStyle={styles.rowText}
+              <TouchableOpacity
                 key={rowIndex}
-                data={getRow(rowData)}
-              />
+                onPress={() => onSelectAlarm(rowData)}
+              >
+                <Row
+                  textStyle={styles.rowText}
+                  key={rowIndex}
+                  data={getRow(rowData)}
+                />
+              </TouchableOpacity>
             ))}
           </TableWrapper>
         </Table>

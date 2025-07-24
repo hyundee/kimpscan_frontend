@@ -9,14 +9,16 @@ import { StyleSheet, TouchableOpacity, View, TextInput, Text, Alert } from "reac
 
 interface INotificationAutocompleteProps {
   onSelect: (item: CoinName) => void;
+  initQuery: string;
 }
 
-export const NotificationAutocomplete = ({ onSelect }: INotificationAutocompleteProps) => {
+export const NotificationAutocomplete = ({ onSelect, initQuery }: INotificationAutocompleteProps) => {
   const [apiCoinData, setApiCoinData] = useState<CoinName[]>([]);
   const { query, setQuery, filteredSuggestions, clear } = useAutocomplete<CoinName>({
     data: apiCoinData,
     extractText: item => item.korName,
     maxLength: 5,
+    initQuery: initQuery,
   });
   const debouncedQuery = useDebounce(query, 500);
 

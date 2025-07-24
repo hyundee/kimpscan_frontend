@@ -18,6 +18,7 @@ import axios from 'axios';
 export const Notification = () => {
   const [active, setActive] = useState(false);
   const [alarmDataList, setAlarmDataList] = useState<AlarmData[]>([]);
+  const [selectedAlarmData, setSelectedAlarmData] = useState<AlarmData | undefined>();
 
   const requestAlarmList = async (): Promise<AlarmData[]> => {
     try {
@@ -58,6 +59,17 @@ export const Notification = () => {
     }
   }
 
+  const handleDeleteAlarm = async (settingId: number) => {
+    await requestDeleteNotification(settingId)
+    updateAlarmList()
+  }
+
+  const handleUpdateAlarm = async (alarmData: AlarmData) => {
+    setSelectedAlarmData(alarmData)
+    setActive(true)
+    console.log('alarmData', alarmData);
+  }
+
   useEffect(() => {
     updateAlarmList()
   }, [])
@@ -72,10 +84,11 @@ export const Notification = () => {
           <Text style={styles.buttonText}>알람 추가 +</Text>
         </TouchableOpacity>
       </View>
-      <NotificationList data={alarmDataList} onDeleteAlarm={async (settingId: number) => {
-        await requestDeleteNotification(settingId)
-        updateAlarmList()
-      }} />
+      <NotificationList
+        data={alarmDataList}
+        onDeleteAlarm={handleDeleteAlarm}
+        onSelectAlarm={handleUpdateAlarm}
+      />
       <Modal
         animationType="slide"
         transparent={true}
@@ -93,6 +106,7 @@ export const Notification = () => {
             <NotificationModal
               onSuccess={() => { updateAlarmList() }}
               setActive={setActive}
+              initialData={selectedAlarmData}
             />
           </View>
         </View>

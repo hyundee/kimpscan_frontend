@@ -4,14 +4,16 @@ type UseAutocompleteOptions<T> = {
   data: T[];
   extractText?: (item: T) => string;
   maxLength: number;
+  initQuery: string;
 };
 
 export function useAutocomplete<T>({
   data,
   extractText = (item) => String(item),
   maxLength = 5,
+  initQuery = '',
 }: UseAutocompleteOptions<T>) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initQuery);
   const [filteredSuggestions, setFilteredSuggestions] = useState<T[]>([]);
 
 
