@@ -29,8 +29,6 @@ export const MyPageScreen = () => {
         </View>
       ) : (
         <View style={styles.container}>
-          {/* <Button title="로그아웃" onPress={handleSignOut} /> */}
-
           <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
             <Text style={styles.logoutText}>로그아웃</Text>
           </TouchableOpacity>

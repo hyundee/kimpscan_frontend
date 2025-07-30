@@ -83,15 +83,19 @@ export const NotificationHistory = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <FlashList<NotificationHistoryData>
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        onEndReached={() => updateNotificationHistory(cursor)}
-        estimatedItemSize={100}
-      />
-    </View>
+    data.length > 0 ?
+      <View style={styles.container}>
+        <FlashList<NotificationHistoryData>
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          onEndReached={() => updateNotificationHistory(cursor)}
+          estimatedItemSize={100}
+        />
+      </View>
+      : <View style={styles.emptyContainer}>
+        <Text>전송된 알림이 없습니다.</Text>
+      </View>
   );
 };
 
@@ -162,4 +166,9 @@ const styles = StyleSheet.create({
     fontSize: 12, // 아이콘 크기 (예: 체크마크)
     fontWeight: 'bold', // 아이콘 텍스트 굵게
   },
+  emptyContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  }
 });
