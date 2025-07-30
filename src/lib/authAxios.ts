@@ -81,7 +81,7 @@ authAxios.interceptors.response.use(
 
         // 로그인 페이지로 이동
         loginStore.signOut();
-        navigate({ name: "MyPage", params: { onNotificationHistory: false } });
+        navigate({ name: "MyPage", params: undefined });
         return Promise.reject(refreshError);
       }
     }

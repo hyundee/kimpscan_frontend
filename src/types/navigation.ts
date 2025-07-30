@@ -1,5 +1,5 @@
 export type RootStackParamList = {
   Home: undefined;
-  MyPage: { onNotificationHistory: boolean };
+  MyPage: undefined;
   Notifications: undefined;
 };

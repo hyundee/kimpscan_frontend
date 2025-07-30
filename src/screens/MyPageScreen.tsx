@@ -5,12 +5,10 @@ import { Auth } from '../components/Auth/Auth';
 import { useLogin } from '@/store/useLogin';
 import { navigate } from '@/navigation/AppNavigator';
 import { NotificationHistory } from '@/components/NotificationHistory/NotificationHistories';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '@/types/navigation';
+import { useNotificationHistory } from '@/store/useNotificationHistory';
 
 export const MyPageScreen = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'MyPage'>>();
-  const onNotificationHistory = route.params && route.params.onNotificationHistory
+  const onNotificationHistory = useNotificationHistory(state => state.onNotificationHistory)
   const isLoggedIn = useLogin(state => state.isLoggedIn)
   const signOut = useLogin(state => state.signOut)
   const handleSignOut = async () => {

@@ -9,6 +9,7 @@ import { Header } from '../components/Header/Header';
 import Home from 'react-native-vector-icons/Foundation';
 import User from 'react-native-vector-icons/Feather';
 import { RootStackParamList } from '@/types/navigation';
+import { useNotificationHistory } from '@/store/useNotificationHistory';
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
@@ -36,6 +37,11 @@ export const AppNavigator = () => {
   return (
     <NavigationContainer ref={navigationRef}>
       <Tab.Navigator
+        screenListeners={({ route }) => ({
+          tabPress: e => {
+            useNotificationHistory.getState().setOnNotificationHistory(false);
+          },
+        })}
         screenOptions={{
           header: CustomHeader,
           tabBarStyle: {
