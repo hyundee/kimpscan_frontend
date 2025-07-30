@@ -3,7 +3,7 @@ import * as Keychain from 'react-native-keychain';
 import { STORAGE_KEYS } from '@/constants/storage-keys';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-interface Login {
+interface ILoginState {
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   hasJwt: boolean;
@@ -14,7 +14,7 @@ interface Login {
   signOut: () => Promise<void>;
 }
 
-export const useLogin = create<Login>()((set, get) => ({
+export const useLogin = create<ILoginState>()((set, get) => ({
   isLoggedIn: false,
   setIsLoggedIn: isLoggedIn => set({ isLoggedIn }),
   hasJwt: false,

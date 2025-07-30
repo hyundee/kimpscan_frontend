@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-interface SelectedCoinState {
+interface ISelectedCoinState {
   coin: string;
   setCoin: (coin: string) => void;
 }
 
-export const useSelectedCoin = create<SelectedCoinState>(set => ({
+export const useSelectedCoin = create<ISelectedCoinState>(set => ({
   coin: 'XRPUSDT',
   setCoin: coin => set({ coin }),
 }));

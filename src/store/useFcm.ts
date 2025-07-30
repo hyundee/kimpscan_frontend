@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-interface IFcm {
+interface IFcmState {
   fcmKey: string | null;
   setFmcKey: (fcmKey: string) => void;
 }
 
-export const useFcm = create<IFcm>(set => ({
+export const useFcm = create<IFcmState>(set => ({
   fcmKey: null,
   setFmcKey: fcmKey => set({ fcmKey }),
 }));
