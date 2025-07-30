@@ -5,7 +5,6 @@ import { useFcm } from "@/store/useFcm";
 import { useEffect } from "react";
 import { useLogin } from "@/store/useLogin";
 import authAxios from "@/lib/authAxios";
-import axios from "axios";
 
 export const Auth = () => {
   const fcmKey = useFcm(state => state.fcmKey);

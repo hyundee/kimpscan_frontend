@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Alert, Button } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import { Notification } from '../components/Notification/Notifications';
 import { Auth } from '../components/Auth/Auth';
 import { useLogin } from '@/store/useLogin';
@@ -29,7 +29,11 @@ export const MyPageScreen = () => {
         </View>
       ) : (
         <View style={styles.container}>
-          <Button title="로그아웃" onPress={handleSignOut} />
+          {/* <Button title="로그아웃" onPress={handleSignOut} /> */}
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
+            <Text style={styles.logoutText}>로그아웃</Text>
+          </TouchableOpacity>
           <Notification />
         </View>
       )
@@ -47,5 +51,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     // alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 6,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
