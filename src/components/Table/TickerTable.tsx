@@ -345,6 +345,7 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
         keyExtractor={(item) => item.symbol[0]}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
+        estimatedItemSize={100}
       />
     </View>
   );

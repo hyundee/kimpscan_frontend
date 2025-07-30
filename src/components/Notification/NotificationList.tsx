@@ -1,9 +1,7 @@
 import { AlarmData } from '@/types/notification';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { TableWrapper } from 'react-native-table-component';
-import { Row } from 'react-native-table-component';
-import { Table } from 'react-native-table-component';
+import { TableWrapper, Cell, Table } from 'react-native-table-component';
 
 interface INotificationListProps {
   data: AlarmData[];
@@ -15,9 +13,9 @@ export const NotificationList = ({ data, onDeleteAlarm, onSelectAlarm }: INotifi
   const headerTitles = ['종목', '김프', '동일알람\n방지기간', '삭제'];
 
   const getRow = (rawRow: AlarmData) => {
-    const rootSymbol = rawRow.symbol.slice(0, -4);
-    const kimp = `${rawRow.kimpPercent}%`
-    const slientTime = `${rawRow.silentTime}초`
+    const rootSymbol = <Text style={styles.rowText}>{rawRow.symbol.slice(0, -4)}</Text>
+    const kimp = <Text style={styles.rowText}>{`${rawRow.kimpPercent}%`}</Text>
+    const slientTime = <Text style={styles.rowText}>{`${rawRow.silentTime}초`}</Text>
     const deleteButton = (
       <TouchableOpacity
         onPress={(event) => {
@@ -54,27 +52,34 @@ export const NotificationList = ({ data, onDeleteAlarm, onSelectAlarm }: INotifi
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Table borderStyle={styles.tableBorder}>
-          <Row
-            style={styles.header}
-            data={headerTitles.map((title, index) => {
-              return (
-                <Text key={index} style={styles.headerText}>
-                  {title}
-                </Text>
-              );
-            })}
-          />
+          <TableWrapper style={styles.headerRowContainer}>
+            {headerTitles.map((item, colIndex) => (
+              <Cell
+                key={colIndex}
+                data={
+                  < View style={styles.cellInner}>
+                    <Text style={styles.headerRowText}>{item}</Text>
+                  </View>
+                }
+                style={styles.cell}
+              />
+            ))}
+          </TableWrapper>
           <TableWrapper>
             {data.map((rowData, rowIndex) => (
               <TouchableOpacity
                 key={rowIndex}
                 onPress={() => onSelectAlarm(rowData)}
               >
-                <Row
-                  textStyle={styles.rowText}
-                  key={rowIndex}
-                  data={getRow(rowData)}
-                />
+                <TableWrapper style={styles.rowContainer}>
+                  {getRow(rowData).map((item, colIndex) => (
+                    <Cell
+                      key={colIndex}
+                      data={item} // JSX도 OK
+                      textStyle={styles.rowText} // 이 경우 object여야 함!
+                    />
+                  ))}
+                </TableWrapper>
               </TouchableOpacity>
             ))}
           </TableWrapper>
@@ -104,13 +109,43 @@ const styles = StyleSheet.create({
   scrollView: {
     backgroundColor: '#fff',
   },
-  rowText: {
-    textAlign: 'center',
-    paddingVertical: 6,
-  },
   deleteButton: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
+  headerRowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    borderBottomWidth: 1,
+    borderColor: '#C1C0B9',
+  },
+  cell: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderColor: '#C1C0B9',
+  },
+  cellInner: {
+    flex: 1,
+    justifyContent: 'center', // 👈 핵심!
+  },
+  headerRowText: {
+    textAlign: 'center',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    paddingVertical: 10,
+  },
+  rowText: {
+    textAlign: 'center',
+    fontSize: 14,
+    paddingVertical: 10,
+    color: 'black',
+    fontWeight: 'normal',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+   },
 });
