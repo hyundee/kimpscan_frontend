@@ -49,9 +49,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     if (!isDiffCoin) {
       setInitCoinList(data);
       setCoinList(data);
-      setTableData(
-        Object.values(data).map(value => getTableDataRow(value))
-      )
     }
   }, [data, isDiffCoin]);
 
@@ -77,6 +74,8 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
   }, [initCoinList, data, isDiffCoin])
 
   useEffect(() => {
+    if (!isDiffCoin) return;
+
     const queryChanged = prevQueryRef.current !== query;
     const bookMarksChanged = !isBookmarkEqual(prevBookMarksRef.current, bookMarks);
     const sortKeyChanged = prevSortKeyRef.current !== sortKey;
@@ -96,8 +95,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
         const lowerRootSymbol = rootSymbol.toLowerCase();
         const lowerKorName = info.korName?.toLowerCase() || '';
 
-        // currentKimp 갱신
-        updateCurrentKimp(info.kimp ?? "0", symbol)
 
         // 북마크
         if (bookMarks[rootSymbol]) {
@@ -110,7 +107,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
           filteredData.push(info)
         }
       }
-      // console.log('bookMarkTableData', bookMarkTableData);
 
       filteredData.sort((a, b) => {
         let aValue: number | string = '';
@@ -137,19 +133,19 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
       setTableData(
         bookMarkTableData.concat(filteredData.map(item => getTableDataRow(item)))
       )
-      // console.log("IN !!!!!!!!!! ")
     } else {
       setTableData(prevTableData => {
         const newTableData: ITableDataRow[] = [];
 
         for (const value of prevTableData) {
           const symbol = `${value.symbol[0]}USDT`
-          const kimp = value.kimpPrice[1];
-          updateCurrentKimp(kimp, symbol)
-
           if (symbol in coinList) {
             const newValue = coinList[symbol]
-            newTableData.push(getTableDataRow(newValue))
+            if (JSON.stringify(value) === JSON.stringify(newValue)) {
+              newTableData.push(value)
+            } else {
+              newTableData.push(getTableDataRow(newValue))
+            }
           } else {
             newTableData.push(value)
           }
@@ -173,7 +169,13 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     // console.log('query', query);
     // console.log('',);
 
-  }, [coinList, query, bookMarks, sortKey, sortOrder])
+  }, [isDiffCoin, coinList, query, bookMarks, sortKey, sortOrder])
+
+  useEffect(() => {
+    Object.entries(coinList).forEach(([symbol, info]) => {
+      updateCurrentKimp(info.kimp ?? '0', symbol)
+    });
+  }, [coinList]);
 
   useEffect(() => {
     loadBookmarks().then(setBookMarks);
@@ -216,8 +218,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
       previousKimp !== undefined && currentKimp > Number(previousKimp)
         ? 'red'
         : 'blue';
-
-    kimpHistoryRef.current[coinSymbol!] = currentKimp;
 
     const kimpValue = Number(value.kimp).toFixed(3);
     const kimpPriceText = `${wonPrice}/${finalUsdtPrice}`;
