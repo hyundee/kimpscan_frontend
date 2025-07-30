@@ -14,6 +14,18 @@ function App(): React.JSX.Element {
   const setFcmKey = useFcm(state => state.setFmcKey)
 
   useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('포그라운드 메시지 수신:', remoteMessage);
+      Alert.alert(
+        remoteMessage.notification?.title || '알림',
+        remoteMessage.notification?.body || '내용 없음'
+      );
+    });
+
+    return unsubscribe; // 컴포넌트 언마운트 시 해제
+  }, []);
+
+  useEffect(() => {
     requestNotificationPermission();
   }, []);
 
