@@ -9,9 +9,12 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { getApp } from '@react-native-firebase/app';
 import { Alert } from 'react-native';
 import { useFcm } from '@/store/useFcm';
+import { useLogin } from '@/store/useLogin';
 
 function App(): React.JSX.Element {
   const setFcmKey = useFcm(state => state.setFmcKey)
+  const getJwt = useLogin(state => state.getJwt)
+  const setIsLoggedIn = useLogin(state => state.setIsLoggedIn)
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -56,6 +59,18 @@ function App(): React.JSX.Element {
 
     fetchFCMToken();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const accessTokenExpiry = await getJwt("accessTokenExpiry")
+      if (accessTokenExpiry) {
+        const isValid = new Date() < new Date(accessTokenExpiry);
+        if (isValid) {
+          setIsLoggedIn(true)
+        }
+      }
+    })()
+  }, [])
 
   return (
     <SafeAreaProvider>
