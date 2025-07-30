@@ -47,7 +47,7 @@ export const MyPageScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 26,
+    paddingTop: 2,
     flex: 1,
     justifyContent: 'center',
     // alignItems: 'center',

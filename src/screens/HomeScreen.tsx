@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 26,
+    paddingTop: 2,
   },
   exchange: {
     width: '100%',
