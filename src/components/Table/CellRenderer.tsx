@@ -11,8 +11,6 @@ interface CellRendererProps {
 }
 
 const renderCellContent = ({ cellDataType, cellData }: CellRendererProps) => {
-  // console.log('CellRenderer rendered:', cellData);  
-
   // 김프
   if (cellDataType === "kimpPrice" && Array.isArray(cellData) && cellData.length >= 3) {
     return (

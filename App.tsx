@@ -18,7 +18,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('포그라운드 메시지 수신:', remoteMessage);
+      // console.log('포그라운드 메시지 수신:', remoteMessage);
       Alert.alert(
         remoteMessage.notification?.title || '알림',
         remoteMessage.notification?.body || '내용 없음'
@@ -43,7 +43,7 @@ function App(): React.JSX.Element {
         try {
           token = await getToken(messaging);
           if (token) {
-            console.log('FCM Token:', token);
+            // console.log('FCM Token:', token);
             setFcmKey(token)
             break; // 성공하면 반복문 탈출
           }

@@ -15,7 +15,7 @@ const authAxios = axios.create({
 // 요청 인터셉터: accessToken 넣기
 authAxios.interceptors.request.use(async config => {
   const creds = await Keychain.getInternetCredentials(STORAGE_KEYS.ACCESS_TOKEN);
-  console.log("creds", creds)
+  // console.log("creds", creds)
   if (!creds) {
     return config
   }

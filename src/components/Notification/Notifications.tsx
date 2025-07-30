@@ -67,7 +67,6 @@ export const Notification = () => {
   const handleUpdateAlarm = async (alarmData: AlarmData) => {
     setSelectedAlarmData(alarmData)
     setActive(true)
-    console.log('alarmData', alarmData);
   }
 
   useEffect(() => {

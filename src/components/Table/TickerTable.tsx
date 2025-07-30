@@ -81,11 +81,6 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
     const sortKeyChanged = prevSortKeyRef.current !== sortKey;
     const sortOrderChanged = prevSortOrderRef.current !== sortOrder;
 
-    // console.log('queryChanged', queryChanged);
-    // console.log('bookMarksChanged', bookMarksChanged);
-    // console.log('sortKeyChanged', sortKeyChanged);
-    // console.log('sortOrderChanged', sortOrderChanged);
-
     if (queryChanged || bookMarksChanged || sortKeyChanged || sortOrderChanged) {
       const lowerCaseQuery = query.toLowerCase()
       const bookMarkTableData: ITableDataRow[] = []
@@ -153,22 +148,12 @@ export const TickerTable = ({ data, isDiffCoin }: ITickerTable) => {
 
         return newTableData;
       });
-
-      // console.log("OUT !!!!!!!!!! ")
     }
 
     prevQueryRef.current = query;
     prevBookMarksRef.current = bookMarks;
     prevSortKeyRef.current = sortKey;
     prevSortOrderRef.current = sortOrder;
-
-    // console.log("coinList", coinList)
-    // console.log('sortKey', sortKey);
-    // console.log('sortOrder', sortOrder);
-    // console.log('bookMarks', bookMarks);
-    // console.log('query', query);
-    // console.log('',);
-
   }, [isDiffCoin, coinList, query, bookMarks, sortKey, sortOrder])
 
   useEffect(() => {

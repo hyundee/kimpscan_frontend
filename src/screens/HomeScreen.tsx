@@ -20,7 +20,6 @@ export const HomeScreen = () => {
       const response = await axios.get(
         `${URLS.API_URL}/exchange/tickers/init`,
       );
-      console.log('Data:', response.data);
       setCoins(response.data);
       setIsDiffCoin(false);
       setIsAfterInit(true);
@@ -31,7 +30,6 @@ export const HomeScreen = () => {
 
   useEffect(() => {
     fetchData();
-    console.log('fetchData 렌더링');
   }, []);
 
   useEffect(() => {
@@ -81,8 +79,6 @@ export const HomeScreen = () => {
       ws.current?.close();
     };
   }, [isAfterInit]);
-
-  console.log(coins);
 
   return (
     <View style={styles.container}>
