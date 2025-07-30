@@ -7,3 +7,13 @@ export type AlarmData = {
   silentTime: number;
   createdAt: string;
 };
+
+export type NotificationHistoryData = {
+  id: number;
+  settingId: number;
+  title: string;
+  content: string;
+  send: boolean;
+  createdAt: string;
+}
+

@@ -1,9 +1,10 @@
-import React from 'react';
-import {View, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
-import {RootStackParamList} from '../../types/navigation';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/navigation';
 import NotificationsIcon from 'react-native-vector-icons/Ionicons';
+import { navigate } from '@/navigation/AppNavigator';
 
 type Navigation = NavigationProp<RootStackParamList, 'Home'>;
 
@@ -21,7 +22,11 @@ export const Header = () => {
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Notifications')}>
+            onPress={() => {
+              navigate({
+                name: "MyPage", params: { onNotificationHistory: true }
+              })
+            }}>
             <NotificationsIcon name="notifications" size={25} color="#000" />
           </TouchableOpacity>
         </View>
