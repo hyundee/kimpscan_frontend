@@ -66,7 +66,7 @@ export const NotificationList = ({ data, onDeleteAlarm, onSelectAlarm }: INotifi
             ))}
           </TableWrapper>
           <TableWrapper>
-            {data.map((rowData, rowIndex) => (
+            {data.length > 0 ? data.map((rowData, rowIndex) => (
               <TouchableOpacity
                 key={rowIndex}
                 onPress={() => onSelectAlarm(rowData)}
@@ -81,7 +81,11 @@ export const NotificationList = ({ data, onDeleteAlarm, onSelectAlarm }: INotifi
                   ))}
                 </TableWrapper>
               </TouchableOpacity>
-            ))}
+            ))
+              : <View style={styles.emptyContainer}>
+                <Text>등록된 알림이 없습니다.</Text>
+              </View>
+            }
           </TableWrapper>
         </Table>
       </ScrollView>
@@ -147,5 +151,10 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-   },
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });
